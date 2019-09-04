@@ -27,22 +27,24 @@ times = ['0:00', '0:15', '0:30', '0:45', '1:00', '1:15', '1:30', '1:45', '2:00',
 dataset_path = "./data/970.csv"
 raw_dataset = pd.read_csv(dataset_path)
 validate = pd.read_csv("./data/970_labels.csv")
-vd = validate.iloc[:,:].values
+vd = validate.iloc[:, :].values
 dataset = raw_dataset.iloc[:, :].values
 # encode text
 transformer = ColumnTransformer(
         transformers=[
                 ("OneHot",        # Just a name
                  OneHotEncoder(), # The transformer class
-                 [0, 1]              # The column(s) to be applied on.
+                 [0, 1]           # The column(s) to be applied on.
                  )
                 ],
         remainder='passthrough' # donot apply anything to the remaining columns
         )
+
+        
 dataset = transformer.fit_transform(dataset.tolist())
-label = transformer.fit_transform(dataset.tolist())
+vd = transformer.fit_transform(dataset.tolist())
 my_data = pd.DataFrame(dataset)
-labels = pd.DataFrame(label)
+labels = pd.DataFrame(vd)
 
         
 # Split data into training 80% and testing 20%
@@ -93,7 +95,7 @@ inputs = Input(shape=(107,))
 # # a layer instance is callable on a tensor, and returns a tensor
 x = Dense(64, activation='relu')(inputs)
 x = Dense(64, activation='relu')(x)
-predictions = Dense(109, activation='softmax')(x)
+predictions = Dense(109, activation='sigmoid')(x)
  
 # # This creates a model that includes
 # # the Input layer and three Dense layers
@@ -106,7 +108,7 @@ model.fit(
      train_scaled,
      validate_scaled, 
      batch_size=32, 
-     epochs=1000, verbose=2, 
+     epochs=100, verbose=2, 
      callbacks=None, 
      validation_split=0.2, 
      validation_data=None, 
@@ -114,4 +116,9 @@ model.fit(
      class_weight=None, 
      sample_weight=None, 
      initial_epoch=0)
+    
 
+fig = plt.figure()  # an empty figure with no axes
+fig.suptitle('Predicted Traffic Flow SCATS 970')  
+
+fig, ax_lst = plt.subplots(2, 2)  # a figure with a 2x2 grid of Axes
