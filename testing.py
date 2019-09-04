@@ -58,6 +58,7 @@ train_stats = train_stats.transpose()
 # Scale data
 x_scaler = MinMaxScaler()
 train_scaled = x_scaler.fit_transform(train_dataset)
+validate_scaled = x_scaler.fit_transform(validate_train)
 test_scaled = x_scaler.fit_transform(test_dataset)
 
 # =============================================================================
@@ -87,7 +88,7 @@ test_scaled = x_scaler.fit_transform(test_dataset)
 #      initial_epoch=0)
 # =============================================================================
 
-
+# Functional model
 inputs = Input(shape=(107,))
 # # a layer instance is callable on a tensor, and returns a tensor
 x = Dense(64, activation='relu')(inputs)
@@ -101,8 +102,9 @@ model.compile(optimizer='rmsprop',
               loss='mse',
               metrics=['accuracy'])
 model.fit(
-     train_scaled, 
-     validate_train, 
+     #train_dataset, 
+     train_scaled,
+     validate_scaled, 
      batch_size=32, 
      epochs=1000, verbose=2, 
      callbacks=None, 
