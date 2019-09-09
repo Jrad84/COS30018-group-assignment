@@ -2,7 +2,7 @@
 """
 Created on Mon Sep  9 16:15:38 2019
 
-@author: User
+@author: JT
 """
 
 import csv
@@ -43,9 +43,11 @@ with open("scats-data.csv", 'r',encoding='utf-8',newline='') as data:
             del scats[1:]
             dates = rows[y].copy()
             del dates[3:]
+            
             del dates[0:2]
+            dates[0].replace('-','')
             while (i < periods):
-                temp = [(scats[0]), (loc[1]), (dates[0]), (times[i]), count[i]]
+                temp = [(scats[0]), (loc[1]), (dates[0].replace('-','')), (times[i]), count[i]]
                 writer.writerow(temp)
                 i+=1
             y+=1
