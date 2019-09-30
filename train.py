@@ -81,7 +81,7 @@ def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--model",
-        default="lstm",
+        default="bidirectional",
         help="Model to train.")
     args = parser.parse_args()
 
@@ -92,6 +92,11 @@ def main(argv):
     X_train, y_train, _, _, _ = process_data(file1, file2, lag)
 
     # experiment with different inputs/ outputs 96 = 24 hours,output 1 = 15 mins
+#daisy a
+    if args.model == 'bidirectional':
+        X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
+        m = model.get_lstm([96, 64, 64, 1]) 
+        train_model(m, X_train, y_train, args.model, config)
     if args.model == 'lstm':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
         m = model.get_lstm([96, 64, 64, 1]) 

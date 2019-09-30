@@ -4,6 +4,8 @@ Defination of NN model
 from keras.layers import Dense, Dropout, Activation
 from keras.layers.recurrent import LSTM, GRU
 from keras.models import Sequential
+#daisy adding bidirectional wrapper
+from keras.layers import Bidirectional
 
 
 def get_lstm(units):
@@ -18,6 +20,25 @@ def get_lstm(units):
 
     model = Sequential()
     model.add(LSTM(units[1], input_shape=(units[0], 1), return_sequences=True))
+    model.add(LSTM(units[2]))
+    model.add(Dropout(0.2))
+    model.add(Dense(units[3], activation='sigmoid'))
+
+    return model
+#daisy-new bidirectional model
+def get_bidirectional(units):
+    """LSTM(Long Short-Term Memory)
+    Build LSTM Model.
+
+    # Arguments
+        units: List(int), number of input, output and hidden units.
+    # Returns
+        model: Model, nn model.
+    """
+
+    model = Sequential()
+#line below only difffernce from ltsm bidirectional wrapper added
+    model.add(Bidirectional(LSTM(units[1], input_shape=(units[0], 1), return_sequences=True)))
     model.add(LSTM(units[2]))
     model.add(Dropout(0.2))
     model.add(Dense(units[3], activation='sigmoid'))

@@ -93,11 +93,12 @@ def plot_results(y_true, y_preds, names):
 
 
 def main():
+    bidirectional = load_model ('model/bidirectional.h5')
     lstm = load_model('model/lstm.h5')
     gru = load_model('model/gru.h5')
     saes = load_model('model/saes.h5')
-    models = [lstm, gru, saes]
-    names = ['LSTM', 'GRU', 'SAEs']
+    models = [lstm, gru, saes, bidirectional]
+    names = ['LSTM', 'GRU', 'SAEs','BIDIRECTIONAL']
 
     lag = 96
     file1 = 'train.csv'
