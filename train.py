@@ -10,6 +10,8 @@ from data.data import process_data
 from model import model
 from keras.models import Model
 from keras.callbacks import EarlyStopping
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 warnings.filterwarnings("ignore")
 
 
@@ -32,10 +34,10 @@ def train_model(model, X_train, y_train, name, config):
         batch_size=config["batch"],
         epochs=config["epochs"],
         validation_split=0.05)
-
-    model.save('model/' + name + '.h5')
+    
+    model.save('model/' + name + '8' + '.h5')
     df = pd.DataFrame.from_dict(hist.history)
-    df.to_csv('model/' + name + ' loss.csv', encoding='utf-8', index=False)
+    df.to_csv('model/' + name + '8' +' loss.csv', encoding='utf-8', index=False)
 
 
 def train_seas(models, X_train, y_train, name, config):
@@ -85,24 +87,28 @@ def main(argv):
         help="Model to train.")
     args = parser.parse_args()
 
-    lag = 96 # how far to look back
-    config = {"batch": 256, "epochs": 5   }
-    file1 = 'train.csv'
-    file2 = 'test.csv'
+    lag = 8 # how far to look back
+    config = {"batch": 256, "epochs": 10  }
+    file1 = './data/train1.csv'
+    file2 = './data/test1.csv'
     X_train, y_train, _, _, _ = process_data(file1, file2, lag)
 
-    # experiment with different inputs/ outputs 96 = 24 hours,output 1 = 15 mins
+    
     if args.model == 'lstm':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_lstm([96, 64, 64, 1]) 
+        m = model.get_lstm([8, 64, 64, 1]) 
+        train_model(m, X_train, y_train, args.model, config)
+    if args.model == 'bidirectional':
+        X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
+        m = model.get_bidirectional([8, 64, 64, 1]) 
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'gru':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_gru([96, 64, 64, 1])
+        m = model.get_gru([8, 64, 64, 1])
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'saes':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
-        m = model.get_saes([96, 400, 400, 400, 1])
+        m = model.get_saes([8, 400, 400, 400, 1])
         train_seas(m, X_train, y_train, args.model, config)
 
 
