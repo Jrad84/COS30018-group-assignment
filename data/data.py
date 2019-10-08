@@ -31,9 +31,9 @@ def process_data(train, test, lags):
     flow2 = scaler.transform(df2[attr].values.reshape(-1, 1)).reshape(1, -1)[0]
 
     train, test = [], []
-    for i in range(lags, len(flow1)):
+    for i in range (lags, len(flow1)):
         train.append(flow1[i - lags: i + 1])
-    for i in range(lags, len(flow2)):
+    for i in range (lags, len(flow2)):
         test.append(flow2[i - lags: i + 1])
 
     train = np.array(train)
