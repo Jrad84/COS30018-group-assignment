@@ -1,0 +1,66 @@
+<Menu>:
+    scats: scats
+    day: day
+    startTime: startTime
+    endTime: endTime
+    direction: direction
+    prediction: prediction
+
+    GridLayout:
+        cols: 1
+        size: root.width - 450, root.height
+        # pos: 0,100
+    
+        GridLayout:
+            cols: 2
+
+            Label:
+                text: "Enter Scats: "
+
+            TextInput:
+                id: scats
+                multiline: False
+            
+            Label:
+                text: "Enter day 0=mon etc "
+
+            TextInput:
+                id: day
+                multiline: False
+
+            Label:
+                text: "Start time: "
+
+            TextInput:
+                id: startTime
+                multiline: False
+
+            Label:
+                text: "End time: "
+
+            TextInput:
+                id: endTime
+                multiline: False
+
+            Label:
+                text: "Direction: "
+
+            TextInput:
+                id: direction
+                multiline: False 
+
+            Label:
+                text: "Average Traffic Count /hr: "
+
+            Label:
+                id: prediction
+                text: ""
+       
+        Button:
+            text: "Run Prediction"
+            font_size: 20
+            size: 175, 50
+            size_hint: None, None # <--
+            on_press: root.btn()
+            # on_release: root.btn()
+
