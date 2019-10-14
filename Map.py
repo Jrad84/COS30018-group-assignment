@@ -18,6 +18,22 @@ import matplotlib.pyplot as plt
 from fiona.crs import from_epsg
 import contextily as ctx 
 
+# converts 4326 to 3857
+def CRSConverter(geoData):
+    geoData.crs = from_epsg(4326)
+    returnData = geoData.to_crs(3857)
+    return returnData
+
+# add distance between each point in km using geodesic
+def DistanceTravelled(path, df):
+    distTotal= 0
+    for i in range(len(path)-1):
+        l1 = df[df['Point']==path[i]].index.values.astype(int)
+        l2 = df[df['Point']==path[i+1]].index.values.astype(int)
+        distIndividual = (geodesic((df.iloc[l1[0]].Latitude, df.iloc[l1[0]].Longitude), (df.iloc[l2[0]].Latitude, df.iloc[l2[0]].Longitude)).kilometers)
+        distTotal += distIndividual
+    return distTotal
+    
 # Prints the whole map with 40 intersections
 def InitialMap(df):
     
@@ -26,9 +42,7 @@ def InitialMap(df):
      df, geometry=geopandas.points_from_xy(df.Longitude, df.Latitude))
     
     # changes epsg for plotting
-    gdf.crs = from_epsg(4326)
-    gdf2 = gdf.copy()
-    gdf2 = gdf2.to_crs(epsg=3857)
+    gdf2 = CRSConverter(gdf)
     
     # plot map, add text as Point and basemap from network x
     ax = gdf2.plot(figsize=(10, 10), alpha=0.5, edgecolor='blue')
@@ -57,18 +71,11 @@ def PathMap(sp, df):
     
     # get orignal df and change to crs
     # this will be helpful to mark intersection on path map that only has line
-    dataFrame = DrawMap.DataFrame()
     gdf = geopandas.GeoDataFrame(
      df, geometry=geopandas.points_from_xy(df.Longitude, df.Latitude))
-      
-    gdf.crs = from_epsg(4326)
-    gdf2 = gdf.copy()
-    gdf2 = gdf2.to_crs(3857)
-    
-    # path geo map, change crs and plot
-    gdfLine.crs = from_epsg(4326)
-    gdfLine2 = gdfLine.copy()
-    gdfLine2 = gdfLine2.to_crs(3857)
+
+    gdf2 = CRSConverter(gdf)
+    gdfLine2 = CRSConverter(gdfLine)
     
     ax = gdfLine2.plot(figsize=(10, 10), alpha=1, edgecolor='red')
 
@@ -85,37 +92,26 @@ def QuickestPath(G, source, target, df):
     sp = nx.shortest_path(G, source=source, target=target)
 
     # add distance between each point in km using geodesic
-    distTotal= 0
-    for i in range(len(sp)-1):
-        # l1 and l2 are row number of each point in data frame
-        l1 = df[df['Point']==sp[i]].index.values.astype(int)
-        l2 = df[df['Point']==sp[i+1]].index.values.astype(int)
-        # calulate distance between points on those row numbers
-        distIndividual = (geodesic((df.iloc[l1[0]].Latitude, df.iloc[l1[0]].Longitude), (df.iloc[l2[0]].Latitude, df.iloc[l2[0]].Longitude)).kilometers)
-        distTotal += distIndividual
-        
+    distTotal= DistanceTravelled(sp, df)        
     PathMap(sp, df)    
     return ((len(sp)), sp, round(distTotal, 2))
 
 # n in the loop number (0, 1, 2, 3)
-def AlternatePaths(G, source, target, df, n):
+# spl shortest path length
+def AlternatePaths(G, source, target, df, n, spl):
     # finds a path
-    alsp = nx.all_simple_paths(G, source=source, target=target)
+    
+    alsp = nx.all_simple_paths(G, source=source, target=target, cutoff=spl+5)
     path = (list(alsp)[n])
     
-    distTotal= 0
-    for i in range(len(path)-1):
-        l1 = df[df['Point']==path[i]].index.values.astype(int)
-        l2 = df[df['Point']==path[i+1]].index.values.astype(int)
-        distIndividual = (geodesic((df.iloc[l1[0]].Latitude, df.iloc[l1[0]].Longitude), (df.iloc[l2[0]].Latitude, df.iloc[l2[0]].Longitude)).kilometers)
-        distTotal += distIndividual
+    distTotal= DistanceTravelled(path, df)
     # clculates distance and returns the path
     PathMap(path, df)  
     return ((len(path)), path, round(distTotal, 2))
     
 def main():
     source = '970'
-    target = '2827'
+    target = '4032'
     
     dataFrame = DrawMap.DataFrame()
     InitialMap(dataFrame)
@@ -129,6 +125,8 @@ def main():
     # adds edges roads   
     G = DrawMap.WithEdge(G)
     intersections, path, distance = QuickestPath(G, source, target, dataFrame)
+    # shortest path length
+    spl = len(path)
     
     print("SHORTEST PATH is via these " + str(intersections) + 
           " intersection points \ntotal distance travelled " 
@@ -140,7 +138,7 @@ def main():
     number_of_paths = min(4,(len((list(alsp)))))
     #prints upto max 4 paths
     for i in range(number_of_paths):
-        intersections, path, distance = AlternatePaths(G, source, target, dataFrame, i)
+        intersections, path, distance = AlternatePaths(G, source, target, dataFrame, i, spl)
         print("Alternative path via these " + str(intersections) + 
           " intersection points \ntotal distance travelled " 
           + str(distance) + " KM\n" + str(path) + "\n")
