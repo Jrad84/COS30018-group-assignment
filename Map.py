@@ -67,7 +67,7 @@ def CreateInitialMap(df):
     for tuples in gdf.itertuples():
         plt.text(tuples.geometry.x, tuples.geometry.y, tuples.Point)
             
-    ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
+    # ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
     ax.set_axis_off()
     return plt
 
@@ -145,7 +145,7 @@ def CreateMapWithPaths(sp, df):
           if sp.__contains__(a.Point):
               plt.text(a.geometry.x, a.geometry.y, a.Point)
               
-    ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
+    # ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
     ax.set_axis_off()
     # plt.show()
     return plt
