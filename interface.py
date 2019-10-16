@@ -9,6 +9,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.tabbedpanel import TabbedPanel
+import networkx as nx
 import geopandas
 import contextily as ctx 
 from fiona.crs import from_epsg
@@ -32,7 +33,7 @@ import DrawMap
 # import matplotlib.pyplot as plt
 
 
-# class Menu(TabbedPanel):
+# class Menu(Widget):
 #     startScats = ObjectProperty(None)
 #     endScats = ObjectProperty(None)
 #     day = ObjectProperty(None)
@@ -133,9 +134,19 @@ class testApp(App):
         #                  y_vars=("Longitude"))
 
         # box.add_widget(FigureCanvasKivyAgg(plt.gcf()))
+        # G=nx.Graph()
+        # for index, row in data.iterrows():
+        #     G.add_node(row.Point, y = row.Latitude , x = row.Longitude, 
+        #             geometry=(row.Longitude, row.Latitude))
+        
+        # G = DrawMap.WithEdge(G)
+        # print(G.nodes)
+        route = Map.createRoute('970', '3682')
+        print(route[0])
         plt = Map.CreateInitialMap(data)
         box.add_widget(FigureCanvasKivyAgg(plt.gcf()))
-        # box.add_widget(FigureCanvasKivy(plt.plot()))
+        # box.add_widget(FigureCanvasKivyAgg(route[1].gcf()))
+        # box.add_widget(FigureCanvasKivy(plt.gcf()))
         return box
 
         
