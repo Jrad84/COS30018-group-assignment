@@ -33,15 +33,28 @@ import DrawMap
 # import matplotlib.pyplot as plt
 
 
-# class Menu(Widget):
-#     startScats = ObjectProperty(None)
-#     endScats = ObjectProperty(None)
-#     day = ObjectProperty(None)
-#     startTime = ObjectProperty(None)
-#     endTime = ObjectProperty(None)
-#     direction = ObjectProperty(None)
-#     prediction = ObjectProperty(None)
+class Menu(Widget):
+
+    def __init__(self, **kwargs):
+        super(Menu, self).__init__(**kwargs)
+        data = DrawMap.DataFrame()
+        self.route = Map.createRoute('970', '3682')
+        # print(self.route[0])
+        self.plt = Map.CreateInitialMap(data)
+        self.run()
+        
+    startScats = ObjectProperty(None)
+    endScats = ObjectProperty(None)
+    day = ObjectProperty(None)
+    startTime = ObjectProperty(None)
+    endTime = ObjectProperty(None)
+    direction = ObjectProperty(None)
+    prediction = ObjectProperty(None)
+    # mapFigure = ObjectProperty(None)
     
+    def run(self):
+        self.ids.mapFigure.add_widget(FigureCanvasKivyAgg(self.plt.gcf()))
+
     
 #     def btn(self):
 
@@ -53,9 +66,12 @@ import DrawMap
 #         d = self.direction.text
 #         self.predict(my_scats, st, et, my_day, d)
 
-#     def getRoute(self):
-#         route = Map.createRoute(np.int64(self.startScats.text), np.int64(self.endScats.text))
-#         self.prediction.text = str(route)
+    def getRoute(self):
+        # route = Map.createRoute(np.int64(self.startScats.text), np.int64(self.endScats.text))
+        # print(self.route[0])
+        self.route = Map.createRoute(self.startScats.text, self.endScats.text)
+        self.prediction.text = str(self.route[0])
+    
 
 #     lstm = load_model('model/lstm8.h5')
 #     gru = load_model('model/gru8.h5')
@@ -118,11 +134,13 @@ import DrawMap
 #         self.prediction.text = str(count_phour)
 #         #plot_results(y_test[: 96], y_preds, names)
 #         #plot_results(y_test, y_preds, names)
+class MapFigure(FigureCanvasKivyAgg):
+    def __init__(self, **kwargs):
+        super(MapFigure, self).__init__(plt.gcf(), **kwargs)
 
 class testApp(App):
     def build(self):
-        data = DrawMap.DataFrame()
-        box = BoxLayout(orientation="horizontal")
+        # data = DrawMap.DataFrame()
 
         # seaborn.set_palette('bright')
         # seaborn.set_style('whitegrid')
@@ -141,13 +159,13 @@ class testApp(App):
         
         # G = DrawMap.WithEdge(G)
         # print(G.nodes)
-        route = Map.createRoute('970', '3682')
-        print(route[0])
-        plt = Map.CreateInitialMap(data)
-        box.add_widget(FigureCanvasKivyAgg(plt.gcf()))
+        # route = Map.createRoute('970', '3682')
+        # print(route[0])
+        # plt = Map.CreateInitialMap(data)
+        # box.add_widget(FigureCanvasKivyAgg(plt.gcf()))
         # box.add_widget(FigureCanvasKivyAgg(route[1].gcf()))
         # box.add_widget(FigureCanvasKivy(plt.gcf()))
-        return box
+        return Menu()
 
         
 def MAPE(y_true, y_pred):
