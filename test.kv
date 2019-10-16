@@ -1,66 +1,110 @@
 <Menu>:
-    scats: scats
+    startScats: startScats
+    endScats: endScats
     day: day
     startTime: startTime
     endTime: endTime
     direction: direction
     prediction: prediction
+    panel5: scat_graph_panel
 
-    GridLayout:
-        cols: 1
-        size: root.width - 450, root.height
-        # pos: 0,100
+    # GridLayout:
+    #     cols: 1
+    #     size: root.width - 450, root.height
+    #     # pos: 0,100
     
-        GridLayout:
-            cols: 2
+    #     GridLayout:
+    #         cols: 2
 
-            Label:
-                text: "Enter Scats: "
+    #         Label:
+    #             text: "Start Scats Point: "
 
-            TextInput:
-                id: scats
-                multiline: False
+    #         TextInput:
+    #             id: startScats
+    #             multiline: False
+
+    #         Label:
+    #             text: "End Scats Point: "
+
+    #         TextInput:
+    #             id: endScats
+    #             multiline: False
             
-            Label:
-                text: "Enter day 0=mon etc "
+    #         Label:
+    #             text: "Enter day 0=mon etc "
 
-            TextInput:
-                id: day
-                multiline: False
+    #         TextInput:
+    #             id: day
+    #             multiline: False
 
-            Label:
-                text: "Start time: "
+    #         Label:
+    #             text: "Start time: "
 
-            TextInput:
-                id: startTime
-                multiline: False
+    #         TextInput:
+    #             id: startTime
+    #             multiline: False
 
-            Label:
-                text: "End time: "
+    #         Label:
+    #             text: "End time: "
 
-            TextInput:
-                id: endTime
-                multiline: False
+    #         TextInput:
+    #             id: endTime
+    #             multiline: False
 
-            Label:
-                text: "Direction: "
+    #         Label:
+    #             text: "Direction: "
 
-            TextInput:
-                id: direction
-                multiline: False 
+    #         TextInput:
+    #             id: direction
+    #             multiline: False 
 
-            Label:
-                text: "Average Traffic Count /hr: "
+    #         Label:
+    #             text: "Average Traffic Count /hr: "
 
-            Label:
-                id: prediction
-                text: ""
+    #         Label:
+    #             id: prediction
+    #             text: ""
        
-        Button:
-            text: "Run Prediction"
-            font_size: 20
-            size: 175, 50
-            size_hint: None, None # <--
-            on_press: root.btn()
-            # on_release: root.btn()
+    #     Button:
+    #         text: "Run Prediction"
+    #         font_size: 20
+    #         size: 175, 50
+    #         size_hint: None, None # <--
+    #         on_press: root.getRoute()
+    #         # on_release: root.btn()
 
+
+    TabbedPanelItem:
+        text: 'Scatter Plot'
+        ScatterPlot:
+            id: scat_graph_panel
+
+<ScatterPlot>:
+    select_btn1: select_btn1
+    select_btn2: select_btn2
+    scatter: scatter
+    orientation: 'vertical'
+    ScatterGraph:
+        id: scatter
+    BoxLayout:
+        size_hint_y: None
+        height: '48dp'
+        Button:
+            id: select_btn1
+            text: 'Select Column 1'
+            on_release: root.dropdown1.open(self)
+            size_hint_y: None
+            height: '48dp'
+        Button:
+            id: select_btn2
+            text: 'Select Column 2'
+            on_release: root.dropdown2.open(self)
+            size_hint_y: None
+            height: '48dp'
+            
+<ScatterGraph>:
+    orientation: 'vertical'
+    
+<ColDropDown>:
+    #on_parent: self.dismiss()
+    #on_select: btn.text = '{}'.format(args[1])

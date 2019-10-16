@@ -4,102 +4,163 @@ from kivy.properties import ObjectProperty
 from kivy.uix.label import Label
 from kivy.uix.widget import Widget
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.dropdown import DropDown
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
-from dfguik import DfguiWidget
-
-import math
-import warnings
-import numpy as np
-import pandas as pd
-from data.data import process_data
-from keras.models import load_model
-from keras.utils.vis_utils import plot_model
-import sklearn.metrics as metrics
-import matplotlib as mpl
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.tabbedpanel import TabbedPanel
+import geopandas
+import contextily as ctx 
+from fiona.crs import from_epsg
+from kivy.garden.matplotlib import FigureCanvasKivy, FigureCanvasKivyAgg
+import seaborn
+from kivy.uix.popup import Popup
 import matplotlib.pyplot as plt
+# from dfguik import DfguiWidget
+import Map
+import DrawMap
+
+# import math
+# import warnings
+# import numpy as np
+# import pandas as pd
+# from data.data import process_data
+# from keras.models import load_model
+# from keras.utils.vis_utils import plot_model
+# import sklearn.metrics as metrics
+# import matplotlib as mpl
+# import matplotlib.pyplot as plt
 
 
-class Menu(Widget):
-    scats = ObjectProperty(None)
-    day = ObjectProperty(None)
-    startTime = ObjectProperty(None)
-    endTime = ObjectProperty(None)
-    direction = ObjectProperty(None)
-    prediction = ObjectProperty(None)
+# class Menu(TabbedPanel):
+#     startScats = ObjectProperty(None)
+#     endScats = ObjectProperty(None)
+#     day = ObjectProperty(None)
+#     startTime = ObjectProperty(None)
+#     endTime = ObjectProperty(None)
+#     direction = ObjectProperty(None)
+#     prediction = ObjectProperty(None)
     
-    def btn(self):
+    
+#     def btn(self):
 
-        print("Scats: ", self.scats.text, "Day: ", self.day.text, "Start Time: ", self.startTime.text, "End time: ", self.endTime.text, "Direction: ", self.direction.text, "Prediction: ", self.prediction.text)
-        self.predict()
+#         print("Scats: ", self.scatStart.text, "Day: ", self.day.text, "Start Time: ", self.startTime.text, "End time: ", self.endTime.text, "Direction: ", self.direction.text, "Prediction: ", self.prediction.text)
+#         my_scats = np.int64(self.scatStart.text)
+#         st = np.int64(self.startTime.text)
+#         et = np.int64(self.endTime.text)
+#         my_day = np.int64(self.day.text)
+#         d = self.direction.text
+#         self.predict(my_scats, st, et, my_day, d)
 
-    lstm = load_model('model/lstm8.h5')
-    gru = load_model('model/gru8.h5')
-    saes = load_model('model/saes8.h5')
+#     def getRoute(self):
+#         route = Map.createRoute(np.int64(self.startScats.text), np.int64(self.endScats.text))
+#         self.prediction.text = str(route)
+
+#     lstm = load_model('model/lstm8.h5')
+#     gru = load_model('model/gru8.h5')
+#     saes = load_model('model/saes8.h5')
   
-    models = [lstm, gru, saes]
-    names = ['LSTM', 'LSTM8', 'GRU', 'GRU8', 'SAEs', 'SAEs8']
+#     models = [lstm, gru, saes]
+#     names = ['LSTM', 'LSTM8', 'GRU', 'GRU8', 'SAEs', 'SAEs8']
 
     
-    def predict(self):
+#     def predict(self, my_scats, st, et, my_day, d):
 
-        # Get input values
-        my_scats = np.int64(self.scats.text)
-        st = np.int64(self.startTime.text)
-        et = np.int64(self.endTime.text)
-        my_day = np.int64(self.day.text)
-        d = self.direction.text
+#         # Get input values
+#         # my_scats = np.int64(self.scats.text)
+#         # st = np.int64(self.startTime.text)
+#         # et = np.int64(self.endTime.text)
+#         # my_day = np.int64(self.day.text)
+#         # d = self.direction.text
 
-        lag= 8
-        # Filter test file on input values
-        file1 = './data/train1.csv'
-        file2 = './data/test1.csv'
-        train = pd.read_csv(file1)
-        test = pd.read_csv(file2)
+#         lag= 8
+#         # Filter test file on input values
+#         file1 = './data/train1.csv'
+#         file2 = './data/test1.csv'
+#         train = pd.read_csv(file1)
+#         test = pd.read_csv(file2)
 
-        train = train[(train['SCATS'] == my_scats) & (train['DAY'] == my_day) 
-        & (train['TIME'] >= st) & (train['TIME'] <= et) & (train[d] > 0)]
+#         train = train[(train['SCATS'] == my_scats) & (train['DAY'] == my_day) 
+#         & (train['TIME'] >= st) & (train['TIME'] <= et) & (train[d] > 0)]
         
-        test = test[(test['SCATS'] == my_scats) & (test['DAY'] == my_day) 
-        & (test['TIME'] >= st) & (test['TIME'] <= et) & (test[d] > 0)]
+#         test = test[(test['SCATS'] == my_scats) & (test['DAY'] == my_day) 
+#         & (test['TIME'] >= st) & (test['TIME'] <= et) & (test[d] > 0)]
         
-        test.to_csv('./data/my_test.csv', encoding='utf-8', index=False)
-        train.to_csv('./data/my_train.csv', encoding='utf-8', index=False)
-        my_test = './data/my_test.csv'
-        my_train = './data/my_train.csv'
-        _, _, X_test, y_test, scaler = process_data(my_train, my_test, lag)
-        y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
+#         test.to_csv('./data/my_test.csv', encoding='utf-8', index=False)
+#         train.to_csv('./data/my_train.csv', encoding='utf-8', index=False)
+#         my_test = './data/my_test.csv'
+#         my_train = './data/my_train.csv'
+#         _, _, X_test, y_test, scaler = process_data(my_train, my_test, lag)
+#         y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
     
-        y_preds = []
-        for name, model in zip(self.names, self.models):
-            if name == 'SAEs':
-                X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
-            else:
-                X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
-        file = 'images/' + name + '.png'
-        plot_model(model, to_file=file, show_shapes=True)
-        predicted = model.predict(X_test)
-        predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
-        y_preds.append(predicted[:96])
-        print(name)
-        eva_regress(y_test, predicted)
+#         y_preds = []
+#         for name, model in zip(self.names, self.models):
+#             if name == 'SAEs':
+#                 X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
+#             else:
+#                 X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
+#         file = 'images/' + name + '.png'
+#         plot_model(model, to_file=file, show_shapes=True)
+#         predicted = model.predict(X_test)
+#         predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
+#         y_preds.append(predicted[:96])
+#         print(name)
+#         eva_regress(y_test, predicted)
         
-        # Get average traffic count per hour
-        time_range = int((et - st) / 100)
-        count = 0
-        for i in range(time_range):
-            count += predicted[i]
+#         # Get average traffic count per hour
+#         time_range = int((et - st) / 100)
+#         count = 0
+#         for i in range(time_range):
+#             count += predicted[i]
         
-        count_phour = count / time_range
-        self.prediction.text = str(count_phour)
-        #plot_results(y_test[: 96], y_preds, names)
-        #plot_results(y_test, y_preds, names)
-
-
+#         count_phour = count / time_range
+#         self.prediction.text = str(count_phour)
+#         #plot_results(y_test[: 96], y_preds, names)
+#         #plot_results(y_test, y_preds, names)
 
 class testApp(App):
     def build(self):
-        return Menu()
+        data = DrawMap.DataFrame()
+        
+        box = BoxLayout(orientation="horizontal")
+
+        # df = data
+        # print(df)
+
+        # seaborn.set_palette('bright')
+        # seaborn.set_style('whitegrid')
+        # seaborn.pairplot(data=df,
+        #                  hue="Point",
+        #                  kind="scatter",
+        #                  diag_kind="hist",
+        #                  x_vars=("Latitude"),
+        #                  y_vars=("Longitude"))
+
+        # box.add_widget(FigureCanvasKivyAgg(plt.gcf()))
+        # convert data frane to geo data frame
+        gdf2 = geopandas.GeoDataFrame(
+        data, geometry=geopandas.points_from_xy(data.Longitude, data.Latitude))
+        print(gdf2.crs)
+        gdf2.crs = from_epsg(3857)
+        # print(gdf.crs)
+        # returnData = gdf.to_crs(3857)
+
+        
+        
+        # changes epsg for plotting
+        # gdf2 = Map.CRSConverter(gdf)
+        # print(gdf)
+        # plot map, add text as Point and basemap from network x
+        ax = gdf2.plot(figsize=(10, 10), alpha=0.5, edgecolor='blue')
+        for tuples in gdf2.itertuples():
+            plt.text(tuples.geometry.x, tuples.geometry.y, tuples.Point)
+                
+        ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
+        ax.set_axis_off()
+        # plt.show()
+        box.add_widget(FigureCanvasKivyAgg(plt.gcf()))
+        # box.add_widget(FigureCanvasKivy(plt.plot()))
+        return box
 
         
 def MAPE(y_true, y_pred):

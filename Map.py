@@ -142,6 +142,30 @@ def main():
         print("Alternative path via these " + str(intersections) + 
           " intersection points \ntotal distance travelled " 
           + str(distance) + " KM\n" + str(path) + "\n")
+
+
+def createRoute(start, end):
+    source = start
+    target = end
+    
+    dataFrame = DrawMap.DataFrame()
+    InitialMap(dataFrame)
+    
+    # creats an empty graph then adds rows (point, lat, long, geometry)
+    G=nx.Graph()
+    for index, row in dataFrame.iterrows():
+        G.add_node(row.Point, y = row.Latitude , x = row.Longitude, 
+                   geometry=(row.Longitude, row.Latitude))
+    
+    # adds edges roads   
+    G = DrawMap.WithEdge(G)
+    intersections, path, distance = QuickestPath(G, source, target, dataFrame)
+    # shortest path length
+    
+    print("SHORTEST PATH is via these " + str(intersections) + 
+          " intersection points \ntotal distance travelled " 
+          + str(distance) + " KM\n" + str(path) + "\n")
+    return intersections
             
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
