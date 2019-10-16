@@ -52,6 +52,26 @@ def InitialMap(df):
     ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
     ax.set_axis_off()
     plt.show()
+
+def CreateInitialMap(df):
+    
+    # convert data frane to geo data frame
+    gdf = geopandas.GeoDataFrame(
+     df, geometry=geopandas.points_from_xy(df.Longitude, df.Latitude))
+    
+    # changes epsg for plotting
+    gdf.crs = from_epsg(3857)
+    
+    # plot map, add text as Point and basemap from network x
+    ax = gdf.plot(figsize=(10, 10), alpha=0.5, edgecolor='blue')
+    for tuples in gdf.itertuples():
+        plt.text(tuples.geometry.x, tuples.geometry.y, tuples.Point)
+            
+    ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
+    ax.set_axis_off()
+    return plt
+
+
     
 # prints the shortest path map    
 def PathMap(sp, df):
@@ -86,6 +106,7 @@ def PathMap(sp, df):
     ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
     ax.set_axis_off()
     plt.show()
+    
 
 def QuickestPath(G, source, target, df):
     # network x finds shortest path as list of nodes/points/intersections

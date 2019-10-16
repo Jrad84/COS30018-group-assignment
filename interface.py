@@ -121,11 +121,7 @@ import DrawMap
 class testApp(App):
     def build(self):
         data = DrawMap.DataFrame()
-        
         box = BoxLayout(orientation="horizontal")
-
-        # df = data
-        # print(df)
 
         # seaborn.set_palette('bright')
         # seaborn.set_style('whitegrid')
@@ -137,27 +133,7 @@ class testApp(App):
         #                  y_vars=("Longitude"))
 
         # box.add_widget(FigureCanvasKivyAgg(plt.gcf()))
-        # convert data frane to geo data frame
-        gdf2 = geopandas.GeoDataFrame(
-        data, geometry=geopandas.points_from_xy(data.Longitude, data.Latitude))
-        print(gdf2.crs)
-        gdf2.crs = from_epsg(3857)
-        # print(gdf.crs)
-        # returnData = gdf.to_crs(3857)
-
-        
-        
-        # changes epsg for plotting
-        # gdf2 = Map.CRSConverter(gdf)
-        # print(gdf)
-        # plot map, add text as Point and basemap from network x
-        ax = gdf2.plot(figsize=(10, 10), alpha=0.5, edgecolor='blue')
-        for tuples in gdf2.itertuples():
-            plt.text(tuples.geometry.x, tuples.geometry.y, tuples.Point)
-                
-        ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
-        ax.set_axis_off()
-        # plt.show()
+        plt = Map.CreateInitialMap(data)
         box.add_widget(FigureCanvasKivyAgg(plt.gcf()))
         # box.add_widget(FigureCanvasKivy(plt.plot()))
         return box
