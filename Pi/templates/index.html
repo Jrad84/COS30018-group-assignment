@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	<div id="smartFan">
+      <h1>SMART LIGHT CONTROLLER</h1>
+    </div>
+
+    <div id="ardTemp">
+      <h3>Distance from Arduino <br></h3>
+    </div>
+
+    <div id="fanStatus">
+      <h3>Light status <br> </h3>
+    </div>
+
+    <div id="threshold">	
+      <h3>Current threshold: <br> </h3>
+    </div>
+
+      <form action="/changeDistanceThreshold" method="post" novalidate>
+        <h3>{{  }} <br>  }} </h3>
+        <p>{{ }}</p>
+      </form> 
+  </div>
+	
+
+{% endblock %}
+    
+
