@@ -6,6 +6,8 @@
     endTime: endTime
     direction: direction
     output: output
+        
+    # Window.size = (300, 100)
 
 
     
@@ -14,9 +16,15 @@
         # size: root.width - 450, root.height
         size: root.size
         # pos: 0,100
-        
+        FloatLayout: 
+            # orientation: "horizontal"
+            # opacity: 0.5
+            # pos_hint: {'right': 1}
+            size: self.size
+            id: mapFigure
     
         GridLayout:
+            # pos_hint: {'left': 1}
             cols: 2
             
 
@@ -75,11 +83,6 @@
                 size: 175, 50
                 size_hint: None, None # <--
                 on_press: root.predictButtion()
-            
-        BoxLayout: 
-            orientation: "horizontal"
-            size: self.size
-            id: mapFigure
 
         GridLayout:
             cols: 1

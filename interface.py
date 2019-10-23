@@ -18,6 +18,9 @@ import numpy as np
 from fiona.crs import from_epsg
 from kivy.garden.matplotlib import FigureCanvasKivy, FigureCanvasKivyAgg
 import matplotlib.pyplot as plt
+# from kivy.config import Config
+from kivy.core.window import Window
+
 # from dfguik import DfguiWidget
 import Map
 import DrawMap
@@ -28,6 +31,7 @@ class Menu(Widget):
 
     def __init__(self, **kwargs):
         super(Menu, self).__init__(**kwargs)
+        Window.size = (1024, 800)
         data = DrawMap.DataFrame()
         self.route = []
         
@@ -66,8 +70,15 @@ class Menu(Widget):
         self.output.text = str(self.route[0])
     
     def fullPredction(self):
-        self.route = Map.generatePaths(self.startScats.text, self.endScats.text)
-        self.output.text = str(self.route[0])
+        pathData = Map.generatePaths(self.startScats.text, self.endScats.text)
+        shortest_route = pathData[0]
+        shortestMap = pathData[1]
+        allPaths = pathData[2]
+        allDistances = pathData[3]
+        self.ids.mapFigure.remove_widget(FigureCanvasKivyAgg(self.plt.gcf()))
+        self.ids.mapFigure.add_widget(FigureCanvasKivyAgg(shortestMap.gcf()))
+        
+        self.output.text = str(pathData[0])
 
 
 class MapFigure(FigureCanvasKivyAgg):
@@ -76,6 +87,7 @@ class MapFigure(FigureCanvasKivyAgg):
 
 class testApp(App):
     def build(self):
+        
         return Menu()
 
 
