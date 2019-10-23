@@ -6,11 +6,9 @@
     endTime: endTime
     direction: direction
     prediction: prediction
-    # panel5: scat_graph_panel
+
 
     
-            
-
     GridLayout:
         cols: 2
         # size: root.width - 450, root.height
@@ -20,6 +18,8 @@
     
         GridLayout:
             cols: 2
+            
+
             Label:
                 text: "Start Scats Point: "
 
@@ -68,20 +68,19 @@
                 size: 175, 50
                 size_hint: None, None # <--
                 on_press: root.getRoute()
-                # on_release: root.btn()
+
             Button:
                 text: "Run Prediction"
                 font_size: 20
                 size: 175, 50
                 size_hint: None, None # <--
-                on_press: root.btn()
-                # on_release: root.btn()
+                on_press: root.prediction()
             
         BoxLayout: 
             orientation: "horizontal"
             size: self.size
             id: mapFigure
-            # MapFigure: 
+
         GridLayout:
             cols: 1
             row_default_height: 40
