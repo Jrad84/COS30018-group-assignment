@@ -80,7 +80,7 @@ class Menu(Widget):
         shortestMap = pathData[1]
         allPaths = pathData[2]
         allDistances = pathData[3]
-        self.ids.mapFigure.remove_widget(FigureCanvasKivyAgg(self.plt.gcf()))
+        # self.ids.mapFigure.remove_widget(FigureCanvasKivyAgg(self.plt.gcf()))
         self.ids.mapFigure.add_widget(FigureCanvasKivyAgg(shortestMap.gcf()))
         currentPrediction = 0
         newPrediction = 0

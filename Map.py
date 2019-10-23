@@ -273,10 +273,30 @@ def generatePaths(start, end):
 def k_shortest_paths(G, source, target, k, weight=None):
     return list(islice(nx.shortest_simple_paths(G, source, target, weight=weight), k))
 
-# def cardinality(point1, point2, dataFrame):
-#     # get the lat and long from the dataframe
-#     #subtract the two points from each other return, 1 direction (flip a coin)
-#     scats1Lat = dataFrame.point1.Latitude
-
-#     point1.Latitude - point2.Latitude = result (if result is positive, N, if negative S)
-#     point1.Longitude - point2.Longitude = result (if result is positive, E, else S)
+def cardinality(point1, point2):
+      
+    df = DrawMap.DataFrame()
+    point1Index = df[df['Point']==point1].index.values.astype(int)
+    point2Index = df[df['Point']==point2].index.values.astype(int)
+    lat2 = df.iloc[point2Index[0]].Latitude
+    lat1 = df.iloc[point1Index[0]].Latitude
+    
+    latDiff = lat2 - lat1
+    if (latDiff > 0):
+        NS = 'N'
+    else:
+        NS = 'S'
+    
+    long2 = df.iloc[point2Index[0]].Longitude
+    long1 = df.iloc[point1Index[0]].Longitude
+    
+    longDiff = long2 - long1
+    if (longDiff > 0):
+        EW = 'E'
+    else:
+        EW = 'W'
+    
+    if ((abs(latDiff) - abs(longDiff)) > 0.0):
+        return NS
+    else:
+        return EW
