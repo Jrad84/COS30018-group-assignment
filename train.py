@@ -27,7 +27,7 @@ def train_model(model, X_train, y_train, name, config):
         config: Dict, parameter for train.
     """
 
-    model.compile(loss="mse", optimizer="rmsprop", metrics=['mape'])
+    model.compile(loss="mse", optimizer="adam", metrics=['mape'])
     # early = EarlyStopping(monitor='val_loss', patience=30, verbose=0, mode='auto')
     hist = model.fit(
         X_train, y_train,
@@ -35,9 +35,9 @@ def train_model(model, X_train, y_train, name, config):
         epochs=config["epochs"],
         validation_split=0.05)
     
-    model.save('model/' + name + '8' + '.h5')
+    model.save('model/' + name + '3_layer_96' + '.h5')
     df = pd.DataFrame.from_dict(hist.history)
-    df.to_csv('model/' + name + '8' +' loss.csv', encoding='utf-8', index=False)
+    df.to_csv('model/' + name + '3_layer_96' +' loss.csv', encoding='utf-8', index=False)
 
 
 def train_seas(models, X_train, y_train, name, config):
@@ -63,7 +63,7 @@ def train_seas(models, X_train, y_train, name, config):
             temp = hidden_layer_model.predict(temp)
 
         m = models[i]
-        m.compile(loss="mse", optimizer="rmsprop", metrics=['mape'])
+        m.compile(loss="mse", optimizer="adam", metrics=['mape'])
 
         m.fit(temp, y_train, batch_size=config["batch"],
               epochs=config["epochs"],
@@ -89,8 +89,8 @@ def main(argv):
 
     lag = 8 # how far to look back
     config = {"batch": 256, "epochs": 10  }
-    file1 = './data/train1.csv'
-    file2 = './data/test1.csv'
+    file1 = './data/train_no_we.csv'
+    file2 = './data/test_no_we.csv'
     X_train, y_train, _, _, _ = process_data(file1, file2, lag)
 
     
@@ -98,9 +98,9 @@ def main(argv):
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
         m = model.get_lstm([8, 64, 64, 1]) 
         train_model(m, X_train, y_train, args.model, config)
-    if args.model == 'bidirectional':
+    if args.model == 'simplernn':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_bidirectional([8, 64, 64, 1]) 
+        m = model.get_simplernn([8, 64, 64, 1]) 
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'gru':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))

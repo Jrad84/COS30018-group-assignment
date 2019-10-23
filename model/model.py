@@ -2,10 +2,20 @@
 Defination of NN model
 """
 from keras.layers import Dense, Dropout, Activation
-from keras.layers.recurrent import LSTM, GRU
+from keras.layers.recurrent import LSTM, GRU, SimpleRNN
+from keras.layers import Bidirectional
+
 from keras.models import Sequential
 
+def get_simplernn(units):
+    model = Sequential()
+    model.add(SimpleRNN(units[1], input_shape=(units[0], 1), return_sequences=True))
+    model.add(SimpleRNN(units[2]))
+    model.add(Dropout(0.2))
+    model.add(Dense(units[3], activation='sigmoid'))
 
+    return model
+    
 def get_lstm(units):
     """LSTM(Long Short-Term Memory)
     Build LSTM Model.
@@ -20,7 +30,7 @@ def get_lstm(units):
     model.add(LSTM(units[1], input_shape=(units[0], 1), return_sequences=True))
     model.add(LSTM(units[2]))
     model.add(Dropout(0.2))
-    model.add(Dense(units[3], activation='sigmoid'))
+    model.add(Dense(units[4], activation='sigmoid'))
 
     return model
 
@@ -38,6 +48,7 @@ def get_gru(units):
     model = Sequential()
     model.add(GRU(units[1], input_shape=(units[0], 1), return_sequences=True))
     model.add(GRU(units[2]))
+#    model.add(GRU(units[2]))
     model.add(Dropout(0.2))
     model.add(Dense(units[3], activation='sigmoid'))
 

@@ -97,56 +97,17 @@ def plot_results(y_true, y_preds, names):
 
     plt.show()
 
-#def predict(my_scats, my_day, st, et, file1, file2): 
-#    test = pd.read_csv(file2)
-#    my_scats = int(my_scats)
-#    st = int(st)
-#    et = int(et)      
-#    my_day = int(my_day)
-#
-#    test = test[(test.SCATS == my_scats) & (test.DAY == my_day) 
-#    & (test.TIME >= st) & (test.TIME <= et) ]
-#        
-#    test.to_csv('custom.csv', encoding='utf-8', index=False)
-#    custom = 'custom.csv'
-#    _, _, X_test, y_test, scaler = process_data(file1, custom, lag)
-#    y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
-#    
-#    y_preds = []
-#    for name, model in zip(names, models):
-#        if name == 'SAEs':
-#            X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
-#        else:
-#            X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
-#    file = 'images/' + name + '.png'
-#    plot_model(model, to_file=file, show_shapes=True)
-#    predicted = model.predict(X_test)
-#    predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
-#    y_preds.append(predicted[:96])
-#    eva_regress(y_test, predicted)
-#        
-#    # Get average traffic count per hour
-#    time_range = int((et - st) / 100)
-#    count = 0
-#    for i in range(time_range):
-#        count += predicted[i]
-#        
-#    count_phour = count / time_range
-#    
-#    
-#    return count_phour
-    
 def main():
     lstm = load_model('model/lstm8.h5')
   
     gru = load_model('model/gru8.h5')
    
     saes = load_model('model/saes8.h5')
+    
+    simple_rnn = load_model('model/simplernn8.h5')
   
-    models = [lstm, gru, saes]
-    names = ['LSTM', 'LSTM8', 'GRU', 'GRU8', 'SAEs', 'SAEs8']
-
-    #lag = 96
+    models = [lstm, gru, saes, simple_rnn]
+    names = ['LSTM', 'GRU', 'SAEs', 'SIMPLE_RNN']
 
     master = tk.Tk()
     tk.Label(master, text="Enter Scats: ").grid(row=0)
@@ -201,8 +162,8 @@ def main():
     
         y_preds = []
         for name, model in zip(names, models):
-            if name == 'SAEs':
-                X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
+            if name == 'SIMPLE_RNN':
+                X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1],1))
             else:
                 X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
         file = 'images/' + name + '.png'
@@ -210,7 +171,6 @@ def main():
         predicted = model.predict(X_test)
         predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
         y_preds.append(predicted[:96])
-        print(name)
         eva_regress(y_test, predicted)
         
         # Get average traffic count per hour
@@ -236,10 +196,6 @@ def main():
                                     sticky=tk.W, 
                                     pady=4)
 
-#    tk.Button(master, text='Predict', command=predict).grid(row=6, column=1,sticky=tk.W,pady=4)
-                                                            
-#    count_phour = predict(my_scats, my_day, st, et, file1, file2)
-#    display.insert(0, count_phour)
     master.mainloop()
 
     tk.mainloop()
