@@ -51,17 +51,16 @@ class Menu(Widget):
     def run(self):
         self.ids.mapFigure.add_widget(FigureCanvasKivyAgg(self.plt.gcf()))
 
-    
     def predictButton(self):
         st = np.int64(self.startTime.text)
         et = np.int64(self.endTime.text)
         my_day = np.int64(self.day.text)
         d = self.direction.text
         self.output.text = ""
+        predictionClass = CleanPrediction()
         for scats in self.route[0]:
             scats = np.int64(scats)
             print(scats)
-            predictionClass = CleanPrediction()
             prediction = predictionClass.predict(scats, st, et, my_day, d)
             self.output.text += str(prediction) + " "
 
@@ -69,7 +68,13 @@ class Menu(Widget):
         self.route = Map.createRoute(self.startScats.text, self.endScats.text)
         self.output.text = str(self.route[0])
     
-    def fullPredction(self):
+    def fullPrediction(self):
+        st = np.int64(self.startTime.text)
+        et = np.int64(self.endTime.text)
+        my_day = np.int64(self.day.text)
+        d = self.direction.text
+        predictionClass = CleanPrediction()
+
         pathData = Map.generatePaths(self.startScats.text, self.endScats.text)
         shortest_route = pathData[0]
         shortestMap = pathData[1]
@@ -77,7 +82,24 @@ class Menu(Widget):
         allDistances = pathData[3]
         self.ids.mapFigure.remove_widget(FigureCanvasKivyAgg(self.plt.gcf()))
         self.ids.mapFigure.add_widget(FigureCanvasKivyAgg(shortestMap.gcf()))
-        
+        currentPrediction = 0
+        newPrediction = 0
+        lowestTrafficPath = 0,0
+        currentPath = 0
+        for path in allPaths:
+            currentPath += 1
+            print("Current Loop: " + str(currentPath))
+            for scats in path:
+                print("Current Scats: " +  scats)
+                newPrediction += predictionClass.predict(str(scats), st, et, my_day, d)
+            if currentPath == 1:
+                currentPrediction = newPrediction
+            else:
+                if newPrediction < currentPrediction:
+                    currentPrediction = newPrediction
+                    lowestTrafficPath = currentPath,currentPrediction
+            print("Current Lowest Trafic: " + str(lowestTrafficPath))
+
         self.output.text = str(pathData[0])
 
 

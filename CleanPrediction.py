@@ -17,15 +17,15 @@ warnings.filterwarnings("ignore")
 
 class CleanPrediction():
     def __init__(self, **kwargs):
-        self.lstm = load_model('model/lstm8.h5')
+        lstm = load_model('model/lstm8.h5')
 
-        self.gru = load_model('model/gru8.h5')
+        gru = load_model('model/gru8.h5')
 
-        self.saes = load_model('model/saes8.h5')
+        saes = load_model('model/saes8.h5')
 
         # self.simple_rnn = load_model('model/simplernn8.h5')
 
-        self.models = [self.lstm, self.gru, self.saes]
+        self.models = [lstm, gru, saes]
         self.names = ['LSTM', 'GRU', 'SAEs']
         # self.run()
 
@@ -110,12 +110,6 @@ class CleanPrediction():
         
     def predict(self, my_scats, st, et, my_day, d):
 
-        # # Get input values
-        # my_scats = int(scats.get())
-        # st = int(start.get())
-        # et = int(end.get())
-        # my_day = int(day.get())
-        # d = dir.get()
         lag= 8
         # Filter test file on input values
         file1 = './data/train1.csv'
