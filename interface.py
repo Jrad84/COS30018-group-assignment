@@ -88,10 +88,16 @@ class Menu(Widget):
         currentPath = 0
         for path in allPaths:
             currentPath += 1
+            intersectionCount = len(path)
             print("Current Loop: " + str(currentPath))
+            i = 0
             for scats in path:
                 print("Current Scats: " +  scats)
+                d = Map.cardinality(path[i], path[i+1])
+                i += 1
                 newPrediction += predictionClass.predict(str(scats), st, et, my_day, d)
+
+                
             if currentPath == 1:
                 currentPrediction = newPrediction
             else:
