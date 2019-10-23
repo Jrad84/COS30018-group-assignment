@@ -3,7 +3,7 @@
 """
 Created on Mon Oct  7 23:27:58 2019
 
-@author: aseem
+@author: Aseem with modifications by Daniel Shawyer
 """
 import DrawMap
 import networkx as nx
@@ -17,6 +17,7 @@ import geopandas
 import matplotlib.pyplot as plt
 from fiona.crs import from_epsg
 import contextily as ctx 
+from itertools import islice
 
 # converts 4326 to 3857
 def CRSConverter(geoData):
@@ -161,6 +162,8 @@ def QuickestPath(G, source, target, df):
     # PathMap(sp, df)    
     return ((len(sp)), sp, round(distTotal, 2))
 
+
+
 # n in the loop number (0, 1, 2, 3)
 # spl shortest path length
 def AlternatePaths(G, source, target, df, n, spl):
@@ -233,6 +236,37 @@ def createRoute(start, end):
           " intersection points \ntotal distance travelled " 
           + str(distance) + " KM\n" + str(path) + "\n")
     return path, CreateMapWithPaths(path,dataFrame)
-            
-# if __name__ == '__main__':
-#     main()
+
+def generatePaths(start, end):
+    dataFrame = DrawMap.DataFrame()
+
+    G=nx.Graph()
+    for index, row in dataFrame.iterrows():
+        G.add_node(row.Point, y = row.Latitude , x = row.Longitude, 
+                   geometry=(row.Longitude, row.Latitude))
+    
+    # adds edges roads   
+    G = DrawMap.WithEdge(G)
+    intersections, shortestPath, distance = QuickestPath(G, start, end, dataFrame)
+    # shortest path length
+    
+    print("SHORTEST PATH is via these " + str(intersections) + 
+          " intersection points \ntotal distance travelled " 
+          + str(distance) + " KM\n" + str(shortestPath) + "\n")
+
+    allShortestPaths = k_shortest_paths(G, start, end, 5)
+
+      
+    print([p for p in allShortestPaths])
+    allDistances=[]
+    for path in allShortestPaths:  
+        allDistances.append(DistanceTravelled(path, dataFrame))
+    # calculates distance and returns the path 
+    print([p for p in allDistances])
+
+
+    return shortestPath, CreateMapWithPaths(shortestPath,dataFrame), allShortestPaths, allDistances
+
+# Based on algorithm by Jin Y. Yen Finding the first K paths requires O(KN3) operations. Ref: “Finding the K Shortest Loopless Paths in a Network”, Management Science, Vol. 17, No. 11, Theory Series (Jul., 1971), pp. 712-716.
+def k_shortest_paths(G, source, target, k, weight=None):
+    return list(islice(nx.shortest_simple_paths(G, source, target, weight=weight), k))

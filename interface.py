@@ -1,3 +1,7 @@
+"""
+@author: Daniel Shawyer
+"""
+
 import kivy 
 from kivy.app import App
 from kivy.properties import ObjectProperty
@@ -37,30 +41,33 @@ class Menu(Widget):
     startTime = ObjectProperty(None)
     endTime = ObjectProperty(None)
     direction = ObjectProperty(None)
-    prediction = ObjectProperty(None)
+    output = ObjectProperty(None)
     # model = ObjectProperty(None)
     
     def run(self):
         self.ids.mapFigure.add_widget(FigureCanvasKivyAgg(self.plt.gcf()))
 
     
-    def prediction(self):
-        # print("Scats: ", self.scatStart.text, "Day: ", self.day.text, "Start Time: ", self.startTime.text, "End time: ", self.endTime.text, "Direction: ", self.direction.text, "Prediction: ", self.prediction.text)
+    def predictButton(self):
         st = np.int64(self.startTime.text)
         et = np.int64(self.endTime.text)
         my_day = np.int64(self.day.text)
         d = self.direction.text
-        self.prediction.text = ""
+        self.output.text = ""
         for scats in self.route[0]:
             scats = np.int64(scats)
             print(scats)
             predictionClass = CleanPrediction()
             prediction = predictionClass.predict(scats, st, et, my_day, d)
-            self.prediction.text += str(prediction) + " "
+            self.output.text += str(prediction) + " "
 
-    def getRoute(self):
+    def routeButton(self):
         self.route = Map.createRoute(self.startScats.text, self.endScats.text)
-        self.prediction.text = str(self.route[0])
+        self.output.text = str(self.route[0])
+    
+    def fullPredction(self):
+        self.route = Map.generatePaths(self.startScats.text, self.endScats.text)
+        self.output.text = str(self.route[0])
 
 
 class MapFigure(FigureCanvasKivyAgg):
@@ -69,14 +76,6 @@ class MapFigure(FigureCanvasKivyAgg):
 
 class testApp(App):
     def build(self):
-        # seaborn.set_palette('bright')
-        # seaborn.set_style('whitegrid')
-        # seaborn.pairplot(data=df,
-        #                  hue="Point",
-        #                  kind="scatter",
-        #                  diag_kind="hist",
-        #                  x_vars=("Latitude"),
-        #                  y_vars=("Longitude"))
         return Menu()
 
 

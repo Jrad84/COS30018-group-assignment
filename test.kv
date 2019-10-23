@@ -5,7 +5,7 @@
     startTime: startTime
     endTime: endTime
     direction: direction
-    prediction: prediction
+    output: output
 
 
     
@@ -67,14 +67,14 @@
                 font_size: 20
                 size: 175, 50
                 size_hint: None, None # <--
-                on_press: root.getRoute()
+                on_press: root.routeButton()
 
             Button:
                 text: "Run Prediction"
                 font_size: 20
                 size: 175, 50
                 size_hint: None, None # <--
-                on_press: root.prediction()
+                on_press: root.predictButtion()
             
         BoxLayout: 
             orientation: "horizontal"
@@ -85,6 +85,12 @@
             cols: 1
             row_default_height: 40
             # size: root.width, 150
+            Button:
+                text: "Run Prediction"
+                font_size: 20
+                size: 175, 50
+                size_hint: None, None # <--
+                on_press: root.fullPredction()
             Label:
                 size_hint_y:None
                 height: 30 
@@ -93,7 +99,7 @@
             Label:
                 size_hint_y:None
                 height: 30 
-                id: prediction
+                id: output
                 text: ""
         
         
