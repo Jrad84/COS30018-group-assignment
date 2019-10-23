@@ -147,7 +147,7 @@ def CreateMapWithPaths(sp, df):
           if sp.__contains__(a.Point):
               plt.text(a.geometry.x, a.geometry.y, a.Point)
               
-    # ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
+    ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
     ax.set_axis_off()
     # plt.show()
     return plt
@@ -264,9 +264,19 @@ def generatePaths(start, end):
     # calculates distance and returns the path 
     print([p for p in allDistances])
 
+    #cardinality list
+
 
     return shortestPath, CreateMapWithPaths(shortestPath,dataFrame), allShortestPaths, allDistances
 
 # Based on algorithm by Jin Y. Yen Finding the first K paths requires O(KN3) operations. Ref: “Finding the K Shortest Loopless Paths in a Network”, Management Science, Vol. 17, No. 11, Theory Series (Jul., 1971), pp. 712-716.
 def k_shortest_paths(G, source, target, k, weight=None):
     return list(islice(nx.shortest_simple_paths(G, source, target, weight=weight), k))
+
+# def cardinality(point1, point2, dataFrame):
+#     # get the lat and long from the dataframe
+#     #subtract the two points from each other return, 1 direction (flip a coin)
+#     scats1Lat = dataFrame.point1.Latitude
+
+#     point1.Latitude - point2.Latitude = result (if result is positive, N, if negative S)
+#     point1.Longitude - point2.Longitude = result (if result is positive, E, else S)
