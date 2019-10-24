@@ -4,13 +4,10 @@
     day: day
     startTime: startTime
     endTime: endTime
-    direction: direction
     output: output
         
     # Window.size = (300, 100)
 
-
-    
     GridLayout:
         cols: 2
         # size: root.width - 450, root.height
@@ -62,13 +59,6 @@
             TextInput:
                 id: endTime
                 multiline: False
-
-            Label:
-                text: "Direction: "
-
-            TextInput:
-                id: direction
-                multiline: False 
 
             Button:
                 text: "Get Shortest Route"

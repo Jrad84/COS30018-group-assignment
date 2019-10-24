@@ -104,10 +104,10 @@ def main():
    
     saes = load_model('model/saes8.h5')
     
-    simple_rnn = load_model('model/simplernn8.h5')
+    # simple_rnn = load_model('model/simplernn8.h5')
   
-    models = [lstm, gru, saes, simple_rnn]
-    names = ['LSTM', 'GRU', 'SAEs', 'SIMPLE_RNN']
+    models = [lstm, gru, saes]
+    names = ['LSTM', 'GRU', 'SAEs']
 
     master = tk.Tk()
     tk.Label(master, text="Enter Scats: ").grid(row=0)

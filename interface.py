@@ -44,7 +44,6 @@ class Menu(Widget):
     day = ObjectProperty(None)
     startTime = ObjectProperty(None)
     endTime = ObjectProperty(None)
-    direction = ObjectProperty(None)
     output = ObjectProperty(None)
     # model = ObjectProperty(None)
     
@@ -69,10 +68,9 @@ class Menu(Widget):
         self.output.text = str(self.route[0])
     
     def fullPrediction(self):
-        st = np.int64(self.startTime.text)
-        et = np.int64(self.endTime.text)
-        my_day = np.int64(self.day.text)
-        d = self.direction.text
+        st = int(self.startTime.text)
+        et = int(self.endTime.text)
+        my_day = int(self.day.text)
         predictionClass = CleanPrediction()
 
         pathData = Map.generatePaths(self.startScats.text, self.endScats.text)
@@ -94,8 +92,9 @@ class Menu(Widget):
             for scats in path:
                 print("Current Scats: " +  scats)
                 d = Map.cardinality(path[i], path[i+1])
+                print("Direction: " + d)
                 i += 1
-                newPrediction += predictionClass.predict(str(scats), st, et, my_day, d)
+                newPrediction += predictionClass.predict(int(scats), st, et, my_day, d)
 
                 
             if currentPath == 1:
