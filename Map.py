@@ -8,7 +8,7 @@ Created on Mon Oct  7 23:27:58 2019
 import DrawMap
 import networkx as nx
 import pandas as pd
-import osmnx as ox
+# import osmnx as ox
 import matplotlib.pyplot as plt
 from geopy.distance import geodesic
 from shapely.geometry import Point, Polygon, LineString
