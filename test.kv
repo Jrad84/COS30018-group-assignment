@@ -5,21 +5,31 @@
     startTime: startTime
     endTime: endTime
     direction: direction
-    prediction: prediction
-    # panel5: scat_graph_panel
+    output: output
+    getCount: getCount
+    mape: mape
 
-    
-            
+    # Window.size = (300, 100)
+
+
 
     GridLayout:
         cols: 2
         # size: root.width - 450, root.height
         size: root.size
         # pos: 0,100
-        
-    
+        FloatLayout:
+            # orientation: "horizontal"
+            # opacity: 0.5
+            # pos_hint: {'right': 1}
+            size: self.size
+            id: mapFigure
+
         GridLayout:
+            # pos_hint: {'left': 1}
             cols: 2
+
+
             Label:
                 text: "Start Scats Point: "
 
@@ -33,16 +43,16 @@
             TextInput:
                 id: endScats
                 multiline: False
-            
+
             Label:
-                text: "Enter day 0=mon etc "
+                text: "Enter day, 0 = Mon..6 = Sun "
 
             TextInput:
                 id: day
                 multiline: False
 
             Label:
-                text: "Start time: "
+                text: "Start time (without ':') "
 
             TextInput:
                 id: startTime
@@ -56,45 +66,57 @@
                 multiline: False
 
             Label:
-                text: "Direction: "
+                text: "Direction (N, S, E, W) "
 
             TextInput:
                 id: direction
-                multiline: False 
+                multiline: False
 
             Button:
                 text: "Get Shortest Route"
                 font_size: 20
                 size: 175, 50
                 size_hint: None, None # <--
-                on_press: root.getRoute()
-                # on_release: root.btn()
+                on_press: root.fullPrediction()
+
             Button:
                 text: "Run Prediction"
                 font_size: 20
                 size: 175, 50
                 size_hint: None, None # <--
-                on_press: root.btn()
-                # on_release: root.btn()
-            
-        BoxLayout: 
-            orientation: "horizontal"
-            size: self.size
-            id: mapFigure
-            # MapFigure: 
+                on_press: root.predictButton()
+
+            Label:
+                text: 'Avg Traffic count per hour: '
+
+            TextInput:
+                id: getCount
+                multiline: False
+
+            Label:
+                text: 'MAPE'
+
+            TextInput:
+                id: mape
+                multiline: False
+
         GridLayout:
             cols: 1
             row_default_height: 40
             # size: root.width, 150
+            Button:
+                #text: "Run Prediction"
+                font_size: 20
+                size: 175, 50
+                size_hint: None, None # <--
+                on_press: root.fullPrediction()
             Label:
                 size_hint_y:None
-                height: 30 
+                height: 30
                 text: "Output: "
 
             Label:
                 size_hint_y:None
-                height: 30 
-                id: prediction
+                height: 30
+                id: output
                 text: ""
-        
-        

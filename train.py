@@ -38,13 +38,13 @@ def train_model(model, X_train, y_train, name, config):
     "logs",
     "fit",
     name,
-    'lstm3_FULL',
+    'lstm_4_4',
     datetime.now().strftime("%Y%m%d-%H%M"),
 )
     tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
 
     model.compile(loss="mse", optimizer="adam", metrics=['mape'])
-    early = EarlyStopping(monitor='val_loss', patience=30, verbose=0, mode='auto')
+    early = EarlyStopping(monitor='val_loss', patience=5, verbose=0, mode='auto')
     hist = model.fit(
         X_train, y_train,
         batch_size=config["batch"],
@@ -52,7 +52,7 @@ def train_model(model, X_train, y_train, name, config):
         validation_split=0.05,
         callbacks=[tensorboard_callback, early])
     
-    model.save('model/' + name + '3_layers_FULL'  + '.h5')
+    model.save('model/' + name + '4_layers_4'  + '.h5')
     df = pd.DataFrame.from_dict(hist.history)
     df.to_csv('model/' + name  +' loss.csv', encoding='utf-8', index=False)
 
@@ -69,7 +69,7 @@ def train_seas(models, X_train, y_train, name, config):
     """
 
     temp = X_train
-    # early = EarlyStopping(monitor='val_loss', patience=30, verbose=0, mode='auto')
+    #early = EarlyStopping(monitor='val_loss', patience=5, verbose=0, mode='auto')
 
     for i in range(len(models) - 1):
         if i > 0:
@@ -104,8 +104,8 @@ def main(argv):
         help="Model to train.")
     args = parser.parse_args()
 
-    lag = 8 # how far to look back
-    config = {"batch": 256, "epochs": 20  }
+    lag = 4 # how far to look back
+    config = {"batch": 256, "epochs": 50  }
     file1 = './data/train1.csv'
     file2 = './data/test1.csv'
     X_train, y_train, _, _, _ = process_data(file1, file2, lag)
@@ -113,19 +113,19 @@ def main(argv):
     
     if args.model == 'lstm':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_lstm([8, 64, 64, 1]) 
+        m = model.get_lstm([4, 64, 64, 1]) 
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'simplernn':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_simplernn([8, 64, 64, 1]) 
+        m = model.get_simplernn([4, 64, 64, 1]) 
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'gru':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_gru([8, 64, 64, 1])
+        m = model.get_gru([4, 64, 64, 1])
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'saes':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
-        m = model.get_saes([8, 400, 400, 400, 1])
+        m = model.get_saes([4, 400, 400, 400, 1])
         train_seas(m, X_train, y_train, args.model, config)
 
 

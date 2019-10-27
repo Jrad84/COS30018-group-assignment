@@ -90,17 +90,17 @@ def plot_results(y_true, y_preds, names):
 
 
 def main():
-    lstm = load_model('model/lstm3 layers.h5')
-    gru = load_model('model/gru8.h5')
+    lstm = load_model('model/lstm4_layers_4.h5')
+    gru = load_model('model/gru4_layers_4.h5')
    
-    saes = load_model('model/saes8.h5')
+    saes = load_model('model/saes4_layers_4.h5')
     
-    simple_rnn = load_model('model/simplernn8.h5')
+    simple_rnn = load_model('model/simplernn4_layers_4.h5')
   
     models = [lstm, gru, saes, simple_rnn]
     names = ['LSTM', 'GRU', 'SAEs', 'SIMPLE_RNN']
 
-    lag = 8
+    lag = 4
     file1 = './data/train1.csv'
     file2 = './data/test1.csv'
     _, _, X_test, y_test, scaler = process_data(file1, file2, lag)
