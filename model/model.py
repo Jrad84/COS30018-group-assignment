@@ -7,12 +7,12 @@ from keras.layers.recurrent import LSTM, GRU, SimpleRNN
 
 from keras.models import Sequential
 
-# Fully-connected RNN where the output is to be fed back to input.
+# Fully-connected RNN where the output is to be fed back to input, not gated
 def get_simplernn(units):
     model = Sequential()
     model.add(SimpleRNN(units[1], input_shape=(units[0], 1), return_sequences=True))
-    #model.add(SimpleRNN(units[2]))
-    #model.add(SimpleRNN(units[2], return_sequences=True))
+    model.add(SimpleRNN(units[2], return_sequences=True))
+    model.add(SimpleRNN(units[2], return_sequences=True))
     model.add(SimpleRNN(units[2]))
     model.add(Dropout(0.2))
     model.add(Dense(units[3], activation='sigmoid'))
@@ -30,9 +30,8 @@ def get_lstm(units):
     """
     model = Sequential()
     model.add(LSTM(units[1], input_shape=(units[0], 1), return_sequences=True))
-    #model.add(LSTM(units[2])) # add return_sequences=True for extra layer
-    #model.add(LSTM(units[2],return_sequences=True ))
-#    model.add(LSTM(units[2],return_sequences=True ))
+    model.add(LSTM(units[2],return_sequences=True ))
+    model.add(LSTM(units[2],return_sequences=True ))
     model.add(LSTM(units[2]))
     model.add(Dropout(0.2))
     model.add(Dense(units[3], activation='sigmoid'))
@@ -52,8 +51,8 @@ def get_gru(units):
 
     model = Sequential()
     model.add(GRU(units[1], input_shape=(units[0], 1), return_sequences=True))
-   # model.add(GRU(units[2]))
-    #model.add(GRU(units[2], return_sequences=True))
+    model.add(GRU(units[2], return_sequences=True))
+    model.add(GRU(units[2], return_sequences=True))
     model.add(GRU(units[2]))
     model.add(Dropout(0.2))
     model.add(Dense(units[3], activation='sigmoid'))
@@ -94,7 +93,7 @@ def get_saes(layers):
     sae1 = _get_sae(layers[0], layers[1], layers[-1])
     sae2 = _get_sae(layers[1], layers[2], layers[-1])
     sae3 = _get_sae(layers[2], layers[3], layers[-1])
-    #sae4 = _get_sae(layers[2], layers[3], layers[-1])
+    sae4 = _get_sae(layers[2], layers[3], layers[-1])
 
     saes = Sequential()
     saes.add(Dense(layers[1], input_dim=layers[0], name='hidden1'))
@@ -103,11 +102,11 @@ def get_saes(layers):
     saes.add(Activation('sigmoid'))
     saes.add(Dense(layers[3], name='hidden3'))
     saes.add(Activation('sigmoid'))
-#    saes.add(Dense(layers[3], name='hidden4'))
-#    saes.add(Activation('sigmoid'))
+    saes.add(Dense(layers[3], name='hidden4'))
+    saes.add(Activation('sigmoid'))
     saes.add(Dropout(0.2))
     saes.add(Dense(layers[4], activation='sigmoid'))
 
-    models = [sae1, sae2, sae3, saes]
+    models = [sae1, sae2, sae3, sae4, saes]
 
     return models

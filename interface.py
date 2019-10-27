@@ -106,7 +106,7 @@ class Menu(Widget):
             for scats in path:
                 print("Current Scats: " +  scats)
                 newPrediction, metrics = predictionClass.predict(np.int64(scats), st, et, my_day, d)
-#                newPrediction += newPredictionA
+#               
                 mape = metrics[0]
                 print(mape)
                 print(newPrediction)
@@ -116,6 +116,7 @@ class Menu(Widget):
             else:
                 if int(newPrediction) < int(currentPrediction):
                     currentPrediction = newPrediction
+                    # Can you use this to calculate travel time?
                     lowestTrafficPath = currentPath,currentPrediction
             print("Current Lowest Trafic: " + str(lowestTrafficPath))
 
