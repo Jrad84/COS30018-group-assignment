@@ -48,6 +48,8 @@ class Menu(Widget):
     output = ObjectProperty(None)
     getCount = ObjectProperty(None)
     mape = ObjectProperty(None)
+    bestRoute = ObjectProperty(None)
+    time = ObjectProperty(None)
 
     
     def run(self):
@@ -74,10 +76,27 @@ class Menu(Widget):
     def routeButton(self):
         self.route = Map.createRoute(self.startScats.text, self.endScats.text)
         self.output.text = str(self.route[0])
-        #self.fullPrediction()
     
     # Calculate travel time based on distance + traffic flow & display in GUI
-    #def calculateTravelTime(self, count, distance):
+    def calculateTravelTime(self, counts, path, distance):
+
+        currentTime = 1
+
+        size = len(path)
+        i = 0
+        #for i in len(path):
+        while (i < size):    
+            # Add 10 seconds per car
+            currentTime += counts[str(path[i])] + 10 
+            # Add 30 sec to pass through each intersection
+            currentTime += 30
+            i += 1
+                  
+        currentTime += distance * 60 #km/hr
+
+        return currentTime
+        
+                
         
     
     def fullPrediction(self):
@@ -85,43 +104,42 @@ class Menu(Widget):
         et = np.int64(self.endTime.text)
         my_day = np.int64(self.day.text)
         d = self.direction.text
-#        start = np.int64(self.startScats.text)
-#        end = np.int64(self.endScats.text)
-        predictionClass = CleanPrediction()
 
-        pathData = Map.generatePaths(self.startScats.text, self.endScats.text)
-        shortest_route = pathData[0]
+        predictionClass = CleanPrediction()
+        counts = {}
+        pathData = Map.generatePaths(self.startScats.text, self.endScats.text)      
         shortestMap = pathData[1]
         allPaths = pathData[2]
-        allDistances = pathData[3]
+        allDistances = np.int64(pathData[3])
+        
         self.ids.mapFigure.remove_widget(FigureCanvasKivyAgg(self.plt.gcf()))
         self.ids.mapFigure.add_widget(FigureCanvasKivyAgg(shortestMap.gcf()))
-        currentPrediction = 0
+
         newPrediction = 0
-        lowestTrafficPath = 0,0
-        currentPath = 0
+
+        times = []
+        firstRun = True
+        i=0
         for path in allPaths:
-            currentPath += 1
-            print("Current Loop: " + str(currentPath))
+
             for scats in path:
-                print("Current Scats: " +  scats)
-                newPrediction, metrics = predictionClass.predict(np.int64(scats), st, et, my_day, d)
-#               
-                mape = metrics[0]
-                print(mape)
-                print(newPrediction)
-                calculateTravelTime(newPrediction, scats, path[scats -1]) # Get distance between 2 SCATS?
-            if currentPath == 1:
-                currentPrediction = newPrediction
-            else:
-                if int(newPrediction) < int(currentPrediction):
-                    currentPrediction = newPrediction
-                    # Can you use this to calculate travel time?
-                    lowestTrafficPath = currentPath,currentPrediction
-            print("Current Lowest Trafic: " + str(lowestTrafficPath))
 
-        self.output.text = str(pathData[0])
-
+                newPrediction = predictionClass.predict(np.int64(scats), st, et, my_day, d)
+                counts[str(scats)] = newPrediction
+                
+            distance = allDistances[i]    
+            currentTime = int(self.calculateTravelTime(counts, path, distance))
+            if firstRun:
+                bestTime = currentTime
+                bestPath = path
+                firstRun = False
+            elif currentTime < bestTime:
+                bestTime = currentTime
+                bestPath = path
+            i += 1
+        bestTime = round((bestTime / 60), 2)
+        self.bestRoute.text = "Via intersections: " + str(bestPath)
+        self.time.text = "Travel time: " + str(bestTime) + " minutes"
 
 class MapFigure(FigureCanvasKivyAgg):
     def __init__(self, **kwargs):

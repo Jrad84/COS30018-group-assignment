@@ -8,6 +8,8 @@
     output: output
     getCount: getCount
     mape: mape
+    bestRoute: bestRoute
+    time: time
 
     # Window.size = (300, 100)
 
@@ -78,6 +80,20 @@
                 size: 175, 50
                 size_hint: None, None # <--
                 on_press: root.fullPrediction()
+
+            Label:
+                text: "Route"
+
+            TextInput:
+                id: bestRoute
+                multiline: False
+
+            Label:
+                text: "Travel time"
+
+            TextInput:
+                id: time
+                multiline: False
 
             Button:
                 text: "Run Prediction"

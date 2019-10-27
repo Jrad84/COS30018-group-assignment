@@ -17,15 +17,15 @@ warnings.filterwarnings("ignore")
 
 class CleanPrediction():
     def __init__(self, **kwargs):
-        lstm = load_model('model/lstm4_layers_4.h5')
+#        lstm = load_model('model/lstm4_layers_4.h5')
         gru = load_model('model/gru4_layers_4.h5')
-   
-        saes = load_model('model/saes4_layers_4.h5')
+#   
+#        saes = load_model('model/saes4_layers_4.h5')
+#
+#        simple_rnn = load_model('model/simplernn4_layers_4.h5')
 
-        simple_rnn = load_model('model/simplernn4_layers_4.h5')
-
-        self.models = [lstm, gru, saes, simple_rnn]
-        self.names = ['LSTM', 'GRU', 'SAEs', 'SIMPLE_RNN']
+        self.models = [gru]
+        self.names = ['GRU']
         # self.run()
         
     def MAPE(y_true, y_pred):
@@ -66,21 +66,16 @@ class CleanPrediction():
         mae = metrics.mean_absolute_error(y_true, y_pred)
         mse = metrics.mean_squared_error(y_true, y_pred)
         r2 = metrics.r2_score(y_true, y_pred)
-#        print('explained_variance_score:%f' % vs)
-#        print('mape:%f%%' % mape)
-#        print('mae:%f' % mae)
-#        print('mse:%f' % mse)
-#        print('rmse:%f' % math.sqrt(mse))
-#        print('r2:%f' % r2)
+
         eval = mape, vs, mae, mse, r2
         return eval
 
  
         
     def predict(self, my_scats, st, et, my_day, d):
-        print(my_scats, st, et, my_day, d)
+
         lag= 4
-        # Filter test file on input values
+        # Filter data files on input values
         file1 = './data/train1.csv'
         file2 = './data/test1.csv'
         train = pd.read_csv(file1)
@@ -95,7 +90,6 @@ class CleanPrediction():
         
         # If test data <= lag, return error
         if (len(test.index) <= 4):
-            print(len(test.index))
             return error
         
         else:
@@ -111,14 +105,14 @@ class CleanPrediction():
                 if name == 'SIMPLE_RNN':
                     X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1],1))
                 else:
-                    X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
+                    X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1],1))
  
-            # plot_model(model, to_file=file, show_shapes=True)
+            
             predicted = model.predict(X_test)
             predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
             y_preds.append(predicted[:96])
             metrics = self.eva_regress(y_test, predicted)
-        
+            
             # Get average traffic count per hour
             time_range = int((et - st) / 100)
             count = 0
@@ -131,6 +125,6 @@ class CleanPrediction():
                     count += predicted[i]
         
             count_phour = np.int64(round((count / time_range),0))
-            print(count_phour)
-            return count_phour, metrics
+           
+            return count_phour
      
