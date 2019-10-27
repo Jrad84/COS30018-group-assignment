@@ -17,9 +17,9 @@ temp = []
 dates=[]
 num_rows = 123 # number of rows in csv file
 
-with open("./data/970_A.csv", 'r',encoding='utf-8') as data:
+with open("./data/simple.csv", 'r',encoding='utf-8') as data:
     reader = csv.reader(data)
-    with open('./data/970_new1.csv', 'w', encoding='utf-8') as newfile:
+    with open('./data/simple1.csv', 'w', encoding='utf-8') as newfile:
         writer = csv.writer(newfile,delimiter=',')
        
         writer.writerow(fields)

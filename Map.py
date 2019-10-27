@@ -52,6 +52,26 @@ def InitialMap(df):
     ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
     ax.set_axis_off()
     plt.show()
+
+def CreateInitialMap(df):
+    
+    # convert data frane to geo data frame
+    gdf = geopandas.GeoDataFrame(
+     df, geometry=geopandas.points_from_xy(df.Longitude, df.Latitude))
+    
+    # changes epsg for plotting
+    gdf.crs = from_epsg(3857)
+    
+    # plot map, add text as Point and basemap from network x
+    ax = gdf.plot(figsize=(10, 10), alpha=0.5, edgecolor='blue')
+    for tuples in gdf.itertuples():
+        plt.text(tuples.geometry.x, tuples.geometry.y, tuples.Point)
+            
+    # ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
+    ax.set_axis_off()
+    return plt
+
+
     
 # prints the shortest path map    
 def PathMap(sp, df):
@@ -63,7 +83,10 @@ def PathMap(sp, df):
         l1 = df[df['Point']==sp[i]].index.values.astype(int)
         l2 = df[df['Point']==sp[i+1]].index.values.astype(int)
         # from row number we get geometry and form list of line
-        listLine.append(LineString([df.iloc[l1[0]].geometry, df.iloc[l2[0]].geometry]))
+        # listLine.append(LineString([df.iloc[l1[0]].geometry, df.iloc[l2[0]].geometry]))
+        point1 = df.iloc[l1[0]].Latitude,df.iloc[l1[0]].Longitude
+        point2 = df.iloc[l2[0]].Latitude,df.iloc[l2[0]].Longitude
+        listLine.append(LineString([point1, point2]))
     
     # convert line to dataframe then to geo df
     dfLine = pd.DataFrame({'geometry': listLine})   
@@ -74,12 +97,15 @@ def PathMap(sp, df):
     gdf = geopandas.GeoDataFrame(
      df, geometry=geopandas.points_from_xy(df.Longitude, df.Latitude))
 
-    gdf2 = CRSConverter(gdf)
-    gdfLine2 = CRSConverter(gdfLine)
-    
-    ax = gdfLine2.plot(figsize=(10, 10), alpha=1, edgecolor='red')
+    # gdf2 = CRSConverter(gdf)
+    # gdfLine2 = CRSConverter(gdfLine)
 
-    for a in gdf2.itertuples():
+    gdf.crs = from_epsg(3857)
+    gdfLine.crs = from_epsg(3857)
+    
+    ax = gdfLine.plot(figsize=(10, 10), alpha=1, edgecolor='red')
+
+    for a in gdf.itertuples():
           if sp.__contains__(a.Point):
               plt.text(a.geometry.x, a.geometry.y, a.Point)
               
@@ -87,13 +113,51 @@ def PathMap(sp, df):
     ax.set_axis_off()
     plt.show()
 
+# prints the shortest path map    
+def CreateMapWithPaths(sp, df):
+    # stores lines/roads/edges of sp (shortest path) 
+    listLine = []
+    
+    for i in range(len(sp)-1):
+        # l1 and l2 are row number of each point in data frame
+        l1 = df[df['Point']==sp[i]].index.values.astype(int)
+        l2 = df[df['Point']==sp[i+1]].index.values.astype(int)
+        # from row number we get geometry and form list of line
+        point1 = df.iloc[l1[0]].Latitude,df.iloc[l1[0]].Longitude
+        point2 = df.iloc[l2[0]].Latitude,df.iloc[l2[0]].Longitude
+        listLine.append(LineString([point1, point2]))
+    
+    # convert line to dataframe then to geo df
+    dfLine = pd.DataFrame({'geometry': listLine})   
+    gdfLine = geopandas.GeoDataFrame(dfLine)
+    
+    # get orignal df and change to crs
+    # this will be helpful to mark intersection on path map that only has line
+    gdf = geopandas.GeoDataFrame(
+     df, geometry=geopandas.points_from_xy(df.Longitude, df.Latitude))
+
+    gdf.crs = from_epsg(3857)
+    gdfLine.crs = from_epsg(3857)
+    
+    ax = gdfLine.plot(figsize=(10, 10), alpha=1, edgecolor='red')
+
+    for a in gdf.itertuples():
+          if sp.__contains__(a.Point):
+              plt.text(a.geometry.x, a.geometry.y, a.Point)
+              
+    # ctx.add_basemap(ax, url=ctx.providers.Stamen.TonerLite, zoom=12)
+    ax.set_axis_off()
+    # plt.show()
+    return plt
+    
+
 def QuickestPath(G, source, target, df):
     # network x finds shortest path as list of nodes/points/intersections
     sp = nx.shortest_path(G, source=source, target=target)
 
     # add distance between each point in km using geodesic
     distTotal= DistanceTravelled(sp, df)        
-    PathMap(sp, df)    
+    # PathMap(sp, df)    
     return ((len(sp)), sp, round(distTotal, 2))
 
 # n in the loop number (0, 1, 2, 3)
@@ -114,6 +178,7 @@ def main():
     target = '4032'
     
     dataFrame = DrawMap.DataFrame()
+    print(dataFrame)
     InitialMap(dataFrame)
     
     # creats an empty graph then adds rows (point, lat, long, geometry)
@@ -142,6 +207,31 @@ def main():
         print("Alternative path via these " + str(intersections) + 
           " intersection points \ntotal distance travelled " 
           + str(distance) + " KM\n" + str(path) + "\n")
+
+
+def createRoute(start, end):
+    source = start
+    target = end
+    # dataFrame = dataframe
+    
+    dataFrame = DrawMap.DataFrame()
+    # CreateInitialMap(dataFrame)
+    
+    # creats an empty graph then adds rows (point, lat, long, geometry)
+    G=nx.Graph()
+    for index, row in dataFrame.iterrows():
+        G.add_node(row.Point, y = row.Latitude , x = row.Longitude, 
+                   geometry=(row.Longitude, row.Latitude))
+    
+    # adds edges roads   
+    G = DrawMap.WithEdge(G)
+    intersections, path, distance = QuickestPath(G, source, target, dataFrame)
+    # shortest path length
+    
+    print("SHORTEST PATH is via these " + str(intersections) + 
+          " intersection points \ntotal distance travelled " 
+          + str(distance) + " KM\n" + str(path) + "\n")
+    return path, CreateMapWithPaths(path,dataFrame)
             
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()

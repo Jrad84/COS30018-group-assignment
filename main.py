@@ -16,7 +16,6 @@ warnings.filterwarnings("ignore")
 def MAPE(y_true, y_pred):
     """Mean Absolute Percentage Error
     Calculate the mape.
-
     # Arguments
         y_true: List/ndarray, ture data.
         y_pred: List/ndarray, predicted data.
@@ -42,7 +41,6 @@ def MAPE(y_true, y_pred):
 def eva_regress(y_true, y_pred):
     """Evaluation
     evaluate the predicted resul.
-
     # Arguments
         y_true: List/ndarray, ture data.
         y_pred: List/ndarray, predicted data.
@@ -64,7 +62,6 @@ def eva_regress(y_true, y_pred):
 def plot_results(y_true, y_preds, names):
     """Plot
     Plot the true data and predicted data.
-
     # Arguments
         y_true: List/ndarray, ture data.
         y_pred: List/ndarray, predicted data.
@@ -93,15 +90,19 @@ def plot_results(y_true, y_preds, names):
 
 
 def main():
-    lstm = load_model('model/lstm.h5')
-    gru = load_model('model/gru.h5')
-    saes = load_model('model/saes.h5')
-    models = [lstm, gru, saes]
-    names = ['LSTM', 'GRU', 'SAEs']
+    lstm = load_model('model/lstm4_layers_4.h5')
+    gru = load_model('model/gru4_layers_4.h5')
+   
+    saes = load_model('model/saes4_layers_4.h5')
+    
+    simple_rnn = load_model('model/simplernn4_layers_4.h5')
+  
+    models = [lstm, gru, saes, simple_rnn]
+    names = ['LSTM', 'GRU', 'SAEs', 'SIMPLE_RNN']
 
-    lag = 96
-    file1 = 'train.csv'
-    file2 = 'test.csv'
+    lag = 4
+    file1 = './data/train1.csv'
+    file2 = './data/test1.csv'
     _, _, X_test, y_test, scaler = process_data(file1, file2, lag)
     y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
 
@@ -115,11 +116,11 @@ def main():
         plot_model(model, to_file=file, show_shapes=True)
         predicted = model.predict(X_test)
         predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
-        y_preds.append(predicted[:288])
+        y_preds.append(predicted[:96])
         print(name)
         eva_regress(y_test, predicted)
 
-    plot_results(y_test[: 288], y_preds, names)
+    plot_results(y_test[: 96], y_preds, names)
 
 
 if __name__ == '__main__':
