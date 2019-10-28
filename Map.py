@@ -162,8 +162,6 @@ def QuickestPath(G, source, target, df):
     # PathMap(sp, df)    
     return ((len(sp)), sp, round(distTotal, 2))
 
-
-
 # n in the loop number (0, 1, 2, 3)
 # spl shortest path length
 def AlternatePaths(G, source, target, df, n, spl):
@@ -178,8 +176,6 @@ def AlternatePaths(G, source, target, df, n, spl):
     return ((len(path)), path, round(distTotal, 2))
     
 def main():
-    source = '970'
-    target = '4032'
     
     dataFrame = DrawMap.DataFrame()
     print(dataFrame)
@@ -194,24 +190,6 @@ def main():
     # adds edges roads   
     G = DrawMap.WithEdge(G)
     intersections, path, distance = QuickestPath(G, source, target, dataFrame)
-    # shortest path length
-    spl = len(path)
-    
-    print("SHORTEST PATH is via these " + str(intersections) + 
-          " intersection points \ntotal distance travelled " 
-          + str(distance) + " KM\n" + str(path) + "\n")
-    
-    # genrates all possible paths (1000s) as a gentaror type
-    alsp = nx.all_simple_paths(G, source=source, target=target)
-    # max 4 more paths (could be any 4, random)
-    number_of_paths = min(4,(len((list(alsp)))))
-    #prints upto max 4 paths
-    for i in range(number_of_paths):
-        intersections, path, distance = AlternatePaths(G, source, target, dataFrame, i, spl)
-        print("Alternative path via these " + str(intersections) + 
-          " intersection points \ntotal distance travelled " 
-          + str(distance) + " KM\n" + str(path) + "\n")
-
 
 def createRoute(start, end):
     source = start
@@ -231,10 +209,6 @@ def createRoute(start, end):
     G = DrawMap.WithEdge(G)
     intersections, path, distance = QuickestPath(G, source, target, dataFrame)
     # shortest path length
-    
-    print("SHORTEST PATH is via these " + str(intersections) + 
-          " intersection points \ntotal distance travelled " 
-          + str(distance) + " KM\n" + str(path) + "\n")
     return path, CreateMapWithPaths(path,dataFrame)
 
 def generatePaths(start, end):
@@ -250,19 +224,13 @@ def generatePaths(start, end):
     intersections, shortestPath, distance = QuickestPath(G, start, end, dataFrame)
     # shortest path length
     
-    print("SHORTEST PATH is via these " + str(intersections) + 
-          " intersection points \ntotal distance travelled " 
-          + str(distance) + " KM\n" + str(shortestPath) + "\n")
-
     allShortestPaths = k_shortest_paths(G, start, end, 5)
-
-      
-    print([p for p in allShortestPaths])
+    
     allDistances=[]
     for path in allShortestPaths:  
         allDistances.append(DistanceTravelled(path, dataFrame))
     # calculates distance and returns the path 
-    print([p for p in allDistances])
+
 
     #cardinality list
 

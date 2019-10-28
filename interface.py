@@ -67,11 +67,6 @@ class Menu(Widget):
         prediction, metrics = predictionClass.predict(scats, st, et, my_day, d)
         self.getCount.text += str(prediction) + " "
         self.mape.text += str(metrics[0]) + "%"
-#        for scats in self.route[0]:
-#            scats = np.int64(scats)
-#            print(scats)
-#            prediction = predictionClass.predict(scats, st, et, my_day, d)
-#            self.output.text += str(prediction) + " "
 
     def routeButton(self):
         self.route = Map.createRoute(self.startScats.text, self.endScats.text)
@@ -79,9 +74,7 @@ class Menu(Widget):
     
     # Calculate travel time based on distance + traffic flow & display in GUI
     def calculateTravelTime(self, counts, path, distance):
-
         currentTime = 1
-
         size = len(path)
         i = 0
         #for i in len(path):
@@ -96,9 +89,6 @@ class Menu(Widget):
 
         return currentTime
         
-                
-        
-    
     def fullPrediction(self):
         st = np.int64(self.startTime.text)
         et = np.int64(self.endTime.text)
@@ -117,17 +107,17 @@ class Menu(Widget):
 
         newPrediction = 0
 
-        times = []
         firstRun = True
         i=0
+        # For each path in possible paths
         for path in allPaths:
-
+            # Get prediction for each intersection
             for scats in path:
-
-                newPrediction = predictionClass.predict(np.int64(scats), st, et, my_day, d)
+                newPrediction = predictionClass.predict(int(scats), st, et, my_day, d)
                 counts[str(scats)] = newPrediction
                 
-            distance = allDistances[i]    
+            distance = allDistances[i]
+            # Calculate travel time based on distance + traffic
             currentTime = int(self.calculateTravelTime(counts, path, distance))
             if firstRun:
                 bestTime = currentTime
@@ -137,6 +127,7 @@ class Menu(Widget):
                 bestTime = currentTime
                 bestPath = path
             i += 1
+        # Convert from seconds to minutes
         bestTime = round((bestTime / 60), 2)
         self.bestRoute.text = "Via intersections: " + str(bestPath)
         self.time.text = "Travel time: " + str(bestTime) + " minutes"
