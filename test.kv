@@ -6,12 +6,14 @@
     endTime: endTime
     direction: direction
     output: output
-    getCount: getCount
-    mape: mape
+	t1:t1
+	t2:t2
+	t3:t3
+	t4:t4
+	t5:t5
     bestRoute: bestRoute
-    time: time
 
-    # Window.size = (300, 100)
+    # Window.size = (250, 100)
 
 
 
@@ -31,7 +33,6 @@
             # pos_hint: {'left': 1}
             cols: 2
 
-
             Label:
                 text: "Start Scats Point: "
 
@@ -47,14 +48,14 @@
                 multiline: False
 
             Label:
-                text: "Enter day, 0 = Mon..6 = Sun "
+                text: "Enter day( 0 = Mon): "
 
             TextInput:
                 id: day
                 multiline: False
 
             Label:
-                text: "Start time (without ':') "
+                text: "Start time (without ':'): "
 
             TextInput:
                 id: startTime
@@ -68,64 +69,66 @@
                 multiline: False
 
             Label:
-                text: "Direction (N, S, E, W) "
+                text: "Direction (N, S, E, W): "
 
             TextInput:
                 id: direction
                 multiline: False
-
+			
+			Label:
+				text:"Model"
+                
+		
+			GridLayout:
+				cols:5
+				row_default_height: 20
+				# size: root.width, 150
+				CheckBox:
+					id: t1
+					group:'model'
+					state:'down'					
+				CheckBox:
+					id: t2
+					group:'model'
+				CheckBox:
+					id: t3	
+					group:'model'
+					
+				CheckBox:
+					id: t4
+					group:'model'
+					
+				CheckBox:
+					id: t5
+					group:'model'
+				Label:
+					text:'GRU'
+				Label:
+					text:'LSTM'
+				Label:
+					text:'SAES'
+				Label:
+					text:'RNN'
+				Label:
+					text:'BI'
+			
+			Label:
             Button:
-                text: "Get Shortest Route"
-                font_size: 20
-                size: 175, 50
+                text: "Predict Fastest Route"
+                font_size: 14
+                size: 200, 50
                 size_hint: None, None # <--
                 on_press: root.fullPrediction()
+			
+			
 
-            Label:
-                text: "Route"
-
-            TextInput:
-                id: bestRoute
-                multiline: False
-
-            Label:
-                text: "Travel time"
-
-            TextInput:
-                id: time
-                multiline: False
-
-            Button:
-                text: "Run Prediction"
-                font_size: 20
-                size: 175, 50
-                size_hint: None, None # <--
-                on_press: root.predictButton()
-
-            Label:
-                text: 'Avg Traffic count per hour: '
-
-            TextInput:
-                id: getCount
-                multiline: False
-
-            Label:
-                text: 'MAPE'
-
-            TextInput:
-                id: mape
-                multiline: False
+			      
 
         GridLayout:
             cols: 1
             row_default_height: 40
             # size: root.width, 150
-            Button:
-                #text: "Run Prediction"
-                font_size: 20
-                size: 175, 50
-                size_hint: None, None # <--
-                on_press: root.fullPrediction()
+           
             Label:
                 size_hint_y:None
                 height: 30
@@ -136,3 +139,14 @@
                 height: 30
                 id: output
                 text: ""
+		GridLayout:
+			cols:1			
+			Label:
+				id: bestRoute
+				size_hint_y: None
+				text_size: self.width, None
+				height: self.texture_size[1]
+				
+			
+			
+			

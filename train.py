@@ -51,7 +51,7 @@ def train_model(model, X_train, y_train, name, config):
         epochs=config["epochs"],
         validation_split=0.05,
         callbacks=[tensorboard_callback, early])
-    
+    print(name);
     model.save('model/' + name + '4_layers_4'  + '.h5')
     df = pd.DataFrame.from_dict(hist.history)
     df.to_csv('model/' + name  +' loss.csv', encoding='utf-8', index=False)
@@ -100,12 +100,12 @@ def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--model",
-        default="lstm",
+        default="bidirectional",
         help="Model to train.")
     args = parser.parse_args()
 
     lag = 4 # how far to look back
-    config = {"batch": 256, "epochs": 50  }
+    config = {"batch": 256, "epochs": 15  }
     file1 = './data/train1.csv'
     file2 = './data/test1.csv'
     X_train, y_train, _, _, _ = process_data(file1, file2, lag)
@@ -114,6 +114,10 @@ def main(argv):
     if args.model == 'lstm':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
         m = model.get_lstm([4, 64, 64, 1]) 
+        train_model(m, X_train, y_train, args.model, config)
+    if args.model == 'bidirectional':
+        X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
+        m = model.get_bidirectional([4, 64, 64, 1]) 
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'simplernn':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))

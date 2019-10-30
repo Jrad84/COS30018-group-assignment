@@ -7,27 +7,25 @@ import numpy as np
 import pandas as pd
 from data.data import process_data
 from keras.models import load_model
-#from keras.utils.vis_utils import plot_model
+from keras.utils.vis_utils import plot_model
 import sklearn.metrics as metrics
-#import matplotlib as mpl
-#import matplotlib.pyplot as plt
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 
 warnings.filterwarnings("ignore")
 
 class CleanPrediction():
+    metrics;
     def __init__(self, **kwargs):
-#        lstm = load_model('model/lstm4_layers_4.h5')
-        gru = load_model('model/gru4_layers_4.h5')
-#   
-#        saes = load_model('model/saes4_layers_4.h5')
-#
-#        simple_rnn = load_model('model/simplernn4_layers_4.h5')
-
-        self.models = [gru]
-        self.names = ['GRU']
-        # self.run()
+        lstm = load_model('model/lstm4_layers_4.h5')
+        gru = load_model('model/gru4_layers_4.h5')  
+        saes = load_model('model/saes4_layers_4.h5')
+        rnn = load_model('model/simplernn4_layers_4.h5')
+        bidirectional=load_model('model/bidirectional4_layers_4.h5')
+        self.models = [gru,lstm,saes,rnn,bidirectional]
         
+   
     def MAPE(y_true, y_pred):
         """Mean Absolute Percentage Error
         Calculate the mape.
@@ -72,7 +70,7 @@ class CleanPrediction():
 
  
         
-    def predict(self, my_scats, st, et, my_day, d):
+    def predict(self, my_scats, st, et, my_day, d,name):
 
         lag= 4
         # Filter data files on input values
@@ -101,18 +99,28 @@ class CleanPrediction():
             y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
 
             y_preds = []
-            for name, model in zip(self.names, self.models):
-                if name == 'SIMPLE_RNN':
-                    X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1],1))
-                else:
-                    X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1],1))
- 
+            
+            if name=='GRU':
+                model=self.models[0]
+            if name=='LSTM':
+                model =self.models[1]
+            if name=='SAES':
+                model=self.models[2]
+            if name =='RNN':
+                model=self.models[3]
+            if name =='BI':
+                model=self.models[4]
+            if name == 'SAES':
+                X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
+            else:
+                X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1],1))
+
             
             predicted = model.predict(X_test)
             predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
             y_preds.append(predicted[:96])
-            metrics = self.eva_regress(y_test, predicted)
-            
+            self.metrics = self.eva_regress(y_test, predicted)
+
             # Get average traffic count per hour
             time_range = int((et - st) / 100)
             count = 0
@@ -125,6 +133,6 @@ class CleanPrediction():
                     count += predicted[i]
         
             count_phour = np.int64(round((count / time_range),0))
-           
+
             return count_phour
-     
+   
