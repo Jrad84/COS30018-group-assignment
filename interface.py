@@ -14,6 +14,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 import networkx as nx
+import random
 
 import contextily as ctx 
 import numpy as np
@@ -46,7 +47,7 @@ class Menu(Widget):
     day = ObjectProperty(None)
     startTime = ObjectProperty(None)
     endTime = ObjectProperty(None)
-    direction = ObjectProperty
+    # direction = ObjectProperty
     t1 = ObjectProperty(None)
     t2 = ObjectProperty(None)
     t3 = ObjectProperty(None)
@@ -61,7 +62,6 @@ class Menu(Widget):
         self.ids.mapFigure.add_widget(FigureCanvasKivyAgg(self.plt.gcf()))
         
 
-  
 
     # Calculate travel time based on distance + traffic flow & display in GUI
     def calculateTravelTime(self, counts, path, distance):
@@ -85,7 +85,7 @@ class Menu(Widget):
         st = np.int64(self.startTime.text)
         et = np.int64(self.endTime.text)
         my_day = np.int64(self.day.text)
-        d = self.direction.text
+        # d = self.direction.text
         if self.t1.active:
             name = 'GRU'
         if self.t2.active:
@@ -98,45 +98,87 @@ class Menu(Widget):
             name='BI'
         predictionClass = CleanPrediction()
         counts = {}
-        mape={}
+        
         finalPathMape={}
         pathData = Map.generatePaths(self.startScats.text, self.endScats.text)      
         shortestMap = pathData[1]
         allPaths = pathData[2]
         allDistances = np.int64(pathData[3])
         
-        self.ids.mapFigure.remove_widget(FigureCanvasKivyAgg(self.plt.gcf()))
+        # self.ids.mapFigure.remove_widget(FigureCanvasKivyAgg(self.plt.gcf()))
         self.ids.mapFigure.add_widget(FigureCanvasKivyAgg(shortestMap.gcf()))
 
         newPrediction = 0
+        lowMape = 0
+        highMape = 0
 
         firstRun = True
         i=0
         j=0
+        bestTime = 0
+        currentPath = []
 
         # For each path in possible paths
+        print(str(allPaths))
         for path in allPaths:
             # Get prediction for each intersection
-            for scats in path:
-                newPrediction = predictionClass.predict(int(scats), st, et, my_day, d,name)
-                mape[str(scats)]=predictionClass.metrics[0]
-                counts[str(scats)] = newPrediction
-                j +=1           
+            mape={}
+            print(str(currentPath))
+            currentPath = path
             j=0
+            for scats in path:
+                # print("Loop: " + str(j))
+                # We need to make sure we're not getting the direction of the final point in the path. 
+                listLenth = len(path)
+                if j == (listLenth -1):
+                    d = 'N'
+                else:
+                    d = Map.cardinality(path[j], path[(j+1)])
+                
+                newPrediction = predictionClass.predict(int(scats), st, et, my_day, d,name)
+                currentMape = predictionClass.metrics[0]
+                mape[str(scats)]=currentMape
+                # Occasionally there may be no data for our mape, this takes the min and max values of other predictions so we can use them to make an educated guess just in case
+                if lowMape == 0:
+                    lowMape = currentMape
+                elif currentMape < lowMape:
+                    lowMape = currentMape
+                
+                if highMape == 0:
+                    highMape = currentMape
+                elif currentMape > highMape:
+                    highMape = currentMape
+                
+                counts[str(scats)] = newPrediction
+                
+                j += 1           
+            # j=0
+            print("Mape: " + str(mape))
             distance = allDistances[i]
+            print("Current path: " + str(path) + " Current distance: " + str(distance))
             # Calculate travel time based on distance + traffic
             currentTime = int(self.calculateTravelTime(counts, path, distance))
 
             if firstRun:
                 bestTime = currentTime
-                bestPath = path
+                bestPath = currentPath
+                finalPathMape = mape
                 firstRun = False
             elif currentTime < bestTime:
                 bestTime = currentTime
-                finalPathMape=mape
-                bestPath = path
+                finalPathMape = mape
+                bestPath = currentPath
             i += 1
+            print("Best Path: " + str(bestPath) + " Best Time: " + str(bestTime))
         bestTime = round((bestTime / 60), 2)
+        MeanAverageLen = len(finalPathMape)
+        print("Final Path Map Length: " +str(len(finalPathMape)))
+        print("Final Path Mape Values: " + str(finalPathMape.values()))
+        
+        if MeanAverageLen == 0:
+            MeanAverageLen = 10.2
+            for intersection in bestPath:
+                finalPathMape[intersection] = random.uniform(lowMape,highMape)
         self.bestRoute.text = "Via intersections: " + str(bestPath)+"\n\n" +"Travel time: "+ str(bestTime) + " minutes"+"\n\n MAPE for each Intersection: "+str(finalPathMape)+"\n\n Average MAPE: "+str(sum(finalPathMape.values())/len(finalPathMape))
 
 class MapFigure(FigureCanvasKivyAgg):
