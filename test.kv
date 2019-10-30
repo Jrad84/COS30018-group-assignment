@@ -4,7 +4,7 @@
     day: day
     startTime: startTime
     endTime: endTime
-    direction: direction
+    # direction: direction
     output: output
 	t1:t1
 	t2:t2
@@ -14,8 +14,6 @@
     bestRoute: bestRoute
 
     # Window.size = (250, 100)
-
-
 
     GridLayout:
         cols: 2
@@ -68,12 +66,12 @@
                 id: endTime
                 multiline: False
 
-            Label:
-                text: "Direction (N, S, E, W): "
+            # Label:
+            #     text: "Direction (N, S, E, W): "
 
-            TextInput:
-                id: direction
-                multiline: False
+            # TextInput:
+            #     id: direction
+            #     multiline: False
 			
 			Label:
 				text:"Model"
@@ -119,10 +117,6 @@
                 size: 200, 50
                 size_hint: None, None # <--
                 on_press: root.fullPrediction()
-			
-			
-
-			      
 
         GridLayout:
             cols: 1
