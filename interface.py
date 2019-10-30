@@ -3,6 +3,8 @@
 """
 
 import kivy 
+from kivy.config import Config
+Config.set('input', 'mouse', 'mouse,disable_multitouch')
 from kivy.app import App
 from kivy.properties import ObjectProperty
 from kivy.uix.label import Label
@@ -28,7 +30,7 @@ from CleanPrediction import CleanPrediction
 
 
 class Menu(Widget):
-
+   
     def __init__(self, **kwargs):
         super(Menu, self).__init__(**kwargs)
         Window.size = (1024, 800)
@@ -44,34 +46,23 @@ class Menu(Widget):
     day = ObjectProperty(None)
     startTime = ObjectProperty(None)
     endTime = ObjectProperty(None)
-    direction = ObjectProperty(None)
-    output = ObjectProperty(None)
-    getCount = ObjectProperty(None)
-    mape = ObjectProperty(None)
+    direction = ObjectProperty
+    t1 = ObjectProperty(None)
+    t2 = ObjectProperty(None)
+    t3 = ObjectProperty(None)
+    t4 = ObjectProperty(None)
+    t5 = ObjectProperty(None)
+    
+    
     bestRoute = ObjectProperty(None)
-    time = ObjectProperty(None)
 
     
     def run(self):
         self.ids.mapFigure.add_widget(FigureCanvasKivyAgg(self.plt.gcf()))
+        
 
-    def predictButton(self):
-        st = np.int64(self.startTime.text)
-        et = np.int64(self.endTime.text)
-        my_day = np.int64(self.day.text)
-        d = self.direction.text
-        self.getCount.text = ""
-        predictionClass = CleanPrediction()
-        scats = np.int64(self.startScats.text)
+  
 
-        prediction, metrics = predictionClass.predict(scats, st, et, my_day, d)
-        self.getCount.text += str(prediction) + " "
-        self.mape.text += str(metrics[0]) + "%"
-
-    def routeButton(self):
-        self.route = Map.createRoute(self.startScats.text, self.endScats.text)
-        self.output.text = str(self.route[0])
-    
     # Calculate travel time based on distance + traffic flow & display in GUI
     def calculateTravelTime(self, counts, path, distance):
         currentTime = 1
@@ -90,13 +81,25 @@ class Menu(Widget):
         return currentTime
         
     def fullPrediction(self):
+       
         st = np.int64(self.startTime.text)
         et = np.int64(self.endTime.text)
         my_day = np.int64(self.day.text)
         d = self.direction.text
-
+        if self.t1.active:
+            name = 'GRU'
+        if self.t2.active:
+            name = 'LSTM'
+        if self.t3.active:
+            name = 'SAES'
+        if self.t4.active:
+            name='RNN'
+        if self.t5.active:
+            name='BI'
         predictionClass = CleanPrediction()
         counts = {}
+        mape={}
+        finalPathMape={}
         pathData = Map.generatePaths(self.startScats.text, self.endScats.text)      
         shortestMap = pathData[1]
         allPaths = pathData[2]
@@ -109,28 +112,32 @@ class Menu(Widget):
 
         firstRun = True
         i=0
+        j=0
+
         # For each path in possible paths
         for path in allPaths:
             # Get prediction for each intersection
             for scats in path:
-                newPrediction = predictionClass.predict(int(scats), st, et, my_day, d)
+                newPrediction = predictionClass.predict(int(scats), st, et, my_day, d,name)
+                mape[str(scats)]=predictionClass.metrics[0]
                 counts[str(scats)] = newPrediction
-                
+                j +=1           
+            j=0
             distance = allDistances[i]
             # Calculate travel time based on distance + traffic
             currentTime = int(self.calculateTravelTime(counts, path, distance))
+
             if firstRun:
                 bestTime = currentTime
                 bestPath = path
                 firstRun = False
             elif currentTime < bestTime:
                 bestTime = currentTime
+                finalPathMape=mape
                 bestPath = path
             i += 1
-        # Convert from seconds to minutes
         bestTime = round((bestTime / 60), 2)
-        self.bestRoute.text = "Via intersections: " + str(bestPath)
-        self.time.text = "Travel time: " + str(bestTime) + " minutes"
+        self.bestRoute.text = "Via intersections: " + str(bestPath)+"\n\n" +"Travel time: "+ str(bestTime) + " minutes"+"\n\n MAPE for each Intersection: "+str(finalPathMape)+"\n\n Average MAPE: "+str(sum(finalPathMape.values())/len(finalPathMape))
 
 class MapFigure(FigureCanvasKivyAgg):
     def __init__(self, **kwargs):
